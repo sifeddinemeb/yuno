@@ -19,7 +19,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     }
 
     // Update color-scheme meta tag
-    const metaColorScheme = document.querySelector('meta[name="color-scheme"]');
+    let metaColorScheme = document.querySelector('meta[name="color-scheme"]');
     if (metaColorScheme) {
       metaColorScheme.setAttribute('content', isDarkMode ? 'dark' : 'light');
     } else {

@@ -21,7 +21,8 @@ import {
   Target,
   TrendingUp,
   Brain,
-  Wand2
+  Wand2,
+  Copy
 } from 'lucide-react';
 import { Search as SearchIcon } from 'lucide-react';
 import Card from '../../../components/ui/Card/Card';
@@ -67,7 +68,100 @@ interface ChallengeAnalytics {
 }
 
 const Challenges = () => {
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  // Sample data for demonstration
+  const [challenges, setChallenges] = useState<Challenge[]>([
+    {
+      id: "a1b2c3d4e5f6a7b8",
+      type: "SentimentSpectrum",
+      title: "Workplace Sarcasm Detection",
+      description: "Identify the tone and sentiment in workplace communication",
+      content: { message: "Oh great, another meeting that could have been an email 📧", options: ["Genuinely excited", "Sarcastic/frustrated", "Neutral", "Confused"] },
+      correct_answer: "Sarcastic/frustrated",
+      signal_tags: ["sarcasm", "workplace-culture"],
+      input_mode: "multiple-choice",
+      difficulty: "medium",
+      is_active: true,
+      created_at: "2025-01-01T12:00:00Z",
+      updated_at: "2025-01-01T12:00:00Z"
+    },
+    {
+      id: "b2c3d4e5f6a7b8c9",
+      type: "MemeTimeWarp",
+      title: "Internet Meme Chronology",
+      description: "Arrange viral memes in chronological order of their popularity",
+      content: { memes: [
+        { id: "distracted_boyfriend", name: "Distracted Boyfriend", year: 2017 }, 
+        { id: "woman_yelling_cat", name: "Woman Yelling at Cat", year: 2019 }, 
+        { id: "drake_pointing", name: "Drake Pointing", year: 2015 }
+      ]},
+      correct_answer: ["drake_pointing", "distracted_boyfriend", "woman_yelling_cat"],
+      signal_tags: ["chronology", "internet-culture"],
+      input_mode: "drag-and-drop",
+      difficulty: "hard",
+      is_active: true,
+      created_at: "2025-01-02T12:00:00Z",
+      updated_at: "2025-01-02T12:00:00Z"
+    },
+    {
+      id: "c3d4e5f6a7b8c9d0",
+      type: "EthicsPing",
+      title: "Privacy vs Security Dilemma",
+      description: "Consider this ethical scenario about balancing privacy rights with security needs",
+      content: {
+        scenario: "A tech company can prevent a terrorist attack by scanning all user messages, but this would violate privacy promises made to millions of users.",
+        choices: [
+          { id: "scan_messages", title: "Scan the messages", description: "Prevent the attack by violating privacy temporarily" },
+          { id: "respect_privacy", title: "Respect privacy", description: "Honor the privacy commitment regardless of consequences" },
+          { id: "seek_warrant", title: "Seek legal authorization", description: "Work through legal channels even if it takes time" }
+        ]
+      },
+      correct_answer: { acceptableChoices: ["scan_messages", "respect_privacy", "seek_warrant"] },
+      signal_tags: ["ethics", "privacy", "security"],
+      input_mode: "multiple-choice",
+      difficulty: "medium",
+      is_active: true,
+      created_at: "2025-01-03T12:00:00Z",
+      updated_at: "2025-01-03T12:00:00Z"
+    },
+    {
+      id: "d4e5f6a7b8c9d0e1",
+      type: "PatternPlay",
+      title: "Sequence Recognition Challenge",
+      description: "Identify the pattern and select the next number in the sequence",
+      content: {
+        sequence: [2, 4, 6, 8, null],
+        options: [10, 12, 9, 8],
+        rule: "Add 2 to each number",
+        category: "arithmetic"
+      },
+      correct_answer: 10,
+      signal_tags: ["pattern-recognition", "logic", "sequence"],
+      input_mode: "multiple-choice",
+      difficulty: "easy",
+      is_active: true,
+      created_at: "2025-01-04T12:00:00Z",
+      updated_at: "2025-01-04T12:00:00Z"
+    },
+    {
+      id: "e5f6a7b8c9d0e1f2",
+      type: "PerceptionFlip",
+      title: "Visual Perception Challenge",
+      description: "This figure can be seen as two different numbers depending on orientation",
+      content: {
+        illusionType: "ambiguous",
+        options: ["6", "9", "Both 6 and 9", "Neither"],
+        hint: "Try rotating your perspective"
+      },
+      correct_answer: { acceptableAnswers: ["Both 6 and 9", "6 or 9"] },
+      signal_tags: ["perception", "visual", "ambiguous"],
+      input_mode: "multiple-choice",
+      difficulty: "medium",
+      is_active: false,
+      created_at: "2025-01-05T12:00:00Z",
+      updated_at: "2025-01-05T12:00:00Z"
+    }
+  ]);
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -80,7 +174,44 @@ const Challenges = () => {
   const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [selectedChallenges, setSelectedChallenges] = useState<string[]>([]);
   const [showAnalytics, setShowAnalytics] = useState<string | null>(null);
-  const [challengeAnalytics, setChallengeAnalytics] = useState<Record<string, ChallengeAnalytics>>({});
+  const [challengeAnalytics, setChallengeAnalytics] = useState<Record<string, ChallengeAnalytics>>({
+    "a1b2c3d4e5f6a7b8": {
+      challengeId: "a1b2c3d4e5f6a7b8",
+      totalAttempts: 324,
+      successfulAttempts: 298,
+      averageResponseTime: 7800,
+      difficultyRating: 65,
+      userSatisfaction: 92,
+      completionRate: 92.0
+    },
+    "b2c3d4e5f6a7b8c9": {
+      challengeId: "b2c3d4e5f6a7b8c9",
+      totalAttempts: 256,
+      successfulAttempts: 225,
+      averageResponseTime: 12500,
+      difficultyRating: 78,
+      userSatisfaction: 88,
+      completionRate: 87.9
+    },
+    "c3d4e5f6a7b8c9d0": {
+      challengeId: "c3d4e5f6a7b8c9d0",
+      totalAttempts: 289,
+      successfulAttempts: 275,
+      averageResponseTime: 9200,
+      difficultyRating: 70,
+      userSatisfaction: 94,
+      completionRate: 95.2
+    },
+    "d4e5f6a7b8c9d0e1": {
+      challengeId: "d4e5f6a7b8c9d0e1",
+      totalAttempts: 312,
+      successfulAttempts: 265,
+      averageResponseTime: 6500,
+      difficultyRating: 55,
+      userSatisfaction: 90,
+      completionRate: 84.9
+    }
+  });
 
   const [newChallenge, setNewChallenge] = useState({
     type: 'SentimentSpectrum',
@@ -114,39 +245,26 @@ const Challenges = () => {
   ];
 
   useEffect(() => {
-    loadChallenges();
+    // Simulate loading data
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   const loadChallenges = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await challengeApi.getAll();
-      setChallenges(data || []);
-
-      // Load analytics for active challenges
-      if (data) {
-        const analyticsPromises = data
-          .filter(c => c.is_active)
-          .slice(0, 10) // Limit to prevent too many API calls
-          .map(async (challenge) => {
-            try {
-              const analytics = await getChallengeAnalytics(challenge.id);
-              return analytics ? { [challenge.id]: analytics } : {};
-            } catch (err) {
-              console.warn(`Failed to load analytics for challenge ${challenge.id}:`, err);
-              return {};
-            }
-          });
-
-        const analyticsResults = await Promise.all(analyticsPromises);
-        const analyticsMap = analyticsResults.reduce((acc, result) => ({ ...acc, ...result }), {});
-        setChallengeAnalytics(analyticsMap);
-      }
+      
+      // In a real implementation, this would fetch data from the API
+      // For now, we'll just simulate a delay and use our sample data
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setLoading(false);
     } catch (err: any) {
       console.error('Error loading challenges:', err);
       setError(err.message || 'Failed to load challenges');
-    } finally {
       setLoading(false);
     }
   };
@@ -176,7 +294,10 @@ const Challenges = () => {
         return;
       }
 
+      // In a real implementation, this would create a challenge via API
+      const newId = Math.random().toString(36).substring(2, 15);
       const challenge = {
+        id: newId,
         type: newChallenge.type,
         title: newChallenge.title,
         description: newChallenge.description,
@@ -186,10 +307,11 @@ const Challenges = () => {
         input_mode: newChallenge.input_mode,
         difficulty: newChallenge.difficulty,
         is_active: newChallenge.is_active,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
       
-      await challengeApi.create(challenge);
-      await loadChallenges();
+      setChallenges([...challenges, challenge]);
       setShowCreateModal(false);
       resetNewChallenge();
     } catch (err: any) {
@@ -237,8 +359,10 @@ const Challenges = () => {
 
   const handleUpdateChallenge = async (id: string, updates: Partial<Challenge>) => {
     try {
-      await challengeApi.update(id, updates);
-      await loadChallenges();
+      // In a real implementation, this would update a challenge via API
+      setChallenges(challenges.map(challenge => 
+        challenge.id === id ? { ...challenge, ...updates, updated_at: new Date().toISOString() } : challenge
+      ));
     } catch (err: any) {
       console.error('Error updating challenge:', err);
       setError(err.message || 'Failed to update challenge');
@@ -249,8 +373,8 @@ const Challenges = () => {
     if (!confirm('Are you sure you want to delete this challenge?')) return;
     
     try {
-      await challengeApi.delete(id);
-      await loadChallenges();
+      // In a real implementation, this would delete a challenge via API
+      setChallenges(challenges.filter(challenge => challenge.id !== id));
     } catch (err: any) {
       console.error('Error deleting challenge:', err);
       setError(err.message || 'Failed to delete challenge');
@@ -258,9 +382,25 @@ const Challenges = () => {
   };
 
   const handleAIContentGenerated = (content: GeneratedContent[]) => {
-    // Content is automatically saved to database by AIContentGenerator
-    // Refresh the challenges list to show new content
-    loadChallenges();
+    // In a real implementation, this would create challenges via API
+    // For now, we'll just add them to our local state
+    const newChallenges = content.map(item => ({
+      id: item.id,
+      type: item.type,
+      title: item.title,
+      description: item.description,
+      content: item.content,
+      correct_answer: item.correct_answer,
+      signal_tags: item.signal_tags,
+      input_mode: item.input_mode,
+      difficulty: item.difficulty,
+      is_active: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+    
+    setChallenges([...challenges, ...newChallenges]);
+    setShowAIGenerator(false);
   };
 
   const resetNewChallenge = () => {
@@ -281,14 +421,15 @@ const Challenges = () => {
     if (!confirm(`Are you sure you want to ${action} ${selectedChallenges.length} challenges?`)) return;
 
     try {
-      for (const id of selectedChallenges) {
-        if (action === 'delete') {
-          await challengeApi.delete(id);
-        } else {
-          await challengeApi.update(id, { is_active: action === 'activate' });
-        }
+      if (action === 'delete') {
+        setChallenges(challenges.filter(challenge => !selectedChallenges.includes(challenge.id)));
+      } else {
+        setChallenges(challenges.map(challenge => 
+          selectedChallenges.includes(challenge.id) 
+            ? { ...challenge, is_active: action === 'activate', updated_at: new Date().toISOString() } 
+            : challenge
+        ));
       }
-      await loadChallenges();
       setSelectedChallenges([]);
     } catch (err: any) {
       console.error(`Error performing bulk ${action}:`, err);

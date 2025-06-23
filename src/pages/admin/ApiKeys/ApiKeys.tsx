@@ -35,7 +35,54 @@ interface ApiKey {
 }
 
 const ApiKeys = () => {
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+  // Sample data for demonstration
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([
+    {
+      id: "a1b2c3d4e5f6a7b8",
+      client_name: "Production Website",
+      api_key: "yuno_live_sk_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+      status: "active",
+      permissions: { read: true, write: true },
+      usage_metrics: { total_requests: 12543, success_rate: 99.7 },
+      created_at: "2025-01-01T12:00:00Z",
+      last_used_at: "2025-01-07T12:34:56Z",
+      created_by: "admin"
+    },
+    {
+      id: "b2c3d4e5f6a7b8c9",
+      client_name: "Mobile App",
+      api_key: "yuno_live_sk_b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7",
+      status: "active",
+      permissions: { read: true, write: true },
+      usage_metrics: { total_requests: 8765, success_rate: 99.5 },
+      created_at: "2025-01-02T12:00:00Z",
+      last_used_at: "2025-01-07T12:30:22Z",
+      created_by: "admin"
+    },
+    {
+      id: "c3d4e5f6a7b8c9d0",
+      client_name: "Development Environment",
+      api_key: "yuno_live_sk_c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8",
+      status: "active",
+      permissions: { read: true, write: true },
+      usage_metrics: { total_requests: 3421, success_rate: 98.2 },
+      created_at: "2025-01-03T12:00:00Z",
+      last_used_at: "2025-01-07T11:45:18Z",
+      created_by: "admin"
+    },
+    {
+      id: "d4e5f6a7b8c9d0e1",
+      client_name: "Test Environment",
+      api_key: "yuno_live_sk_d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8g9",
+      status: "inactive",
+      permissions: { read: true, write: false },
+      usage_metrics: { total_requests: 1254, success_rate: 97.8 },
+      created_at: "2025-01-04T12:00:00Z",
+      last_used_at: "2025-01-06T15:22:43Z",
+      created_by: "admin"
+    }
+  ]);
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -51,19 +98,26 @@ const ApiKeys = () => {
   });
 
   useEffect(() => {
-    loadApiKeys();
+    // Simulate loading data
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   const loadApiKeys = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await apiKeyApi.getAll();
-      setApiKeys(data || []);
+      
+      // In a real implementation, this would fetch data from the API
+      // For now, we'll just simulate a delay and use our sample data
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setLoading(false);
     } catch (err: any) {
       console.error('Error loading API keys:', err);
       setError(err.message || 'Failed to load API keys');
-    } finally {
       setLoading(false);
     }
   };
@@ -80,15 +134,24 @@ const ApiKeys = () => {
     }
 
     try {
-      const apiKey = await apiKeyApi.create({
-        client_name: newApiKey.client_name,
-        permissions: { read: true, write: newApiKey.permissions === 'full-access' },
-        usage_metrics: {},
-        created_by: adminUser.id
-      });
+      // In a real implementation, this would create an API key via API
+      const newKey = `yuno_live_sk_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
       
-      setGeneratedKey(apiKey.api_key);
-      await loadApiKeys();
+      setGeneratedKey(newKey);
+      
+      const apiKey = {
+        id: Math.random().toString(36).substring(2, 15),
+        client_name: newApiKey.client_name,
+        api_key: newKey,
+        status: 'active',
+        permissions: { read: true, write: newApiKey.permissions === 'full-access' },
+        usage_metrics: { total_requests: 0, success_rate: 0 },
+        created_at: new Date().toISOString(),
+        last_used_at: null,
+        created_by: adminUser.id
+      };
+      
+      setApiKeys([...apiKeys, apiKey]);
       setNewApiKey({ client_name: '', permissions: 'full-access' });
     } catch (err: any) {
       console.error('Error creating API key:', err);
@@ -98,8 +161,8 @@ const ApiKeys = () => {
 
   const handleUpdateApiKey = async (id: string, updates: Partial<ApiKey>) => {
     try {
-      await apiKeyApi.update(id, updates);
-      await loadApiKeys();
+      // In a real implementation, this would update an API key via API
+      setApiKeys(apiKeys.map(key => key.id === id ? { ...key, ...updates } : key));
     } catch (err: any) {
       console.error('Error updating API key:', err);
       setError(err.message || 'Failed to update API key');
@@ -110,8 +173,8 @@ const ApiKeys = () => {
     if (!confirm('Are you sure you want to delete this API key? This action cannot be undone.')) return;
     
     try {
-      await apiKeyApi.delete(id);
-      await loadApiKeys();
+      // In a real implementation, this would delete an API key via API
+      setApiKeys(apiKeys.filter(key => key.id !== id));
     } catch (err: any) {
       console.error('Error deleting API key:', err);
       setError(err.message || 'Failed to delete API key');
@@ -351,8 +414,8 @@ function App() {
               Integrate the Yuno widget into your application using one of the methods below:
             </p>
             
-            <div className="bg-dark-200 rounded-lg p-4">
-              <pre className="text-sm overflow-x-auto">
+            <div className="bg-dark-200 rounded-lg p-4 overflow-x-auto">
+              <pre className="text-sm">
                 <code>{integrationCode}</code>
               </pre>
             </div>
