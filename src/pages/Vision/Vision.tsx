@@ -1,12 +1,23 @@
 import { motion } from 'framer-motion';
+import { useNavigate, Link } from 'react-router-dom';
+import { useTransition } from 'react';
 import { ArrowRight, Shield, Brain, Zap, CheckCircle, Users, TrendingUp } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import Card from '../../components/ui/Card/Card';
 import ThemeToggle from '../../components/ui/ThemeToggle/ThemeToggle';
 import YunoWidget from '../../components/widget/YunoWidget/YunoWidget';
 
 const Vision = () => {
+  const navigate = useNavigate();
+  const [isPending, startTransition] = useTransition();
+  
+  const handleNavigation = (path: string) => {
+    // Wrap navigation in startTransition to avoid throttling warnings
+    startTransition(() => {
+      navigate(path);
+    });
+  };
+
   return (
     <div className="min-h-screen">
       {/* Theme Toggle */}
@@ -28,11 +39,21 @@ const Vision = () => {
             </Link>
             <div className="hidden md:flex items-center space-x-8">
               <Link to="/" className="text-neon-blue font-semibold">Vision</Link>
-              <Link to="/impact" className="text-secondary hover:text-primary transition-colors">Impact</Link>
-              <Link to="/demo" className="text-secondary hover:text-primary transition-colors">Demo</Link>
-              <Link to="/auth/login">
+              <button 
+                onClick={() => handleNavigation('/impact')} 
+                className="text-secondary hover:text-primary transition-colors bg-transparent border-none"
+              >
+                Impact
+              </button>
+              <button 
+                onClick={() => handleNavigation('/demo')} 
+                className="text-secondary hover:text-primary transition-colors bg-transparent border-none"
+              >
+                Demo
+              </button>
+              <button onClick={() => handleNavigation('/auth/login')}>
                 <Button size="sm">Get Started</Button>
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -66,16 +87,22 @@ const Vision = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/demo">
+              <button 
+                onClick={() => handleNavigation('/demo')} 
+                disabled={isPending}
+              >
                 <Button size="lg" className="px-8">
                   Try Live Demo <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
-              </Link>
-              <Link to="/impact">
+              </button>
+              <button 
+                onClick={() => handleNavigation('/impact')} 
+                disabled={isPending}
+              >
                 <Button variant="secondary" size="lg" className="px-8">
                   Learn More
                 </Button>
-              </Link>
+              </button>
             </div>
           </motion.div>
         </div>
@@ -353,16 +380,22 @@ const Vision = () => {
               to the future of AI.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/demo">
+              <button 
+                onClick={() => handleNavigation('/demo')} 
+                disabled={isPending}
+              >
                 <Button size="lg" className="px-8">
                   Try Live Demo <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
-              </Link>
-              <Link to="/auth/login">
+              </button>
+              <button 
+                onClick={() => handleNavigation('/auth/login')} 
+                disabled={isPending}
+              >
                 <Button variant="secondary" size="lg" className="px-8">
                   Get Started
                 </Button>
-              </Link>
+              </button>
             </div>
           </motion.div>
         </div>

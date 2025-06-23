@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { useStore } from '../store/useStore'
@@ -10,11 +10,12 @@ export interface AdminUser {
   role: string
 }
 
-// Global state to prevent multiple simultaneous initializations
-let globalInitState = {
+// Singleton pattern for auth state to prevent multiple initializations
+const authState = {
   isInitializing: false,
   isInitialized: false,
-  lastInitTime: 0
+  lastInitTime: 0,
+  authChangeListeners: new Set()
 }
 
 export const useAuth = () => {
@@ -25,136 +26,113 @@ export const useAuth = () => {
   
   const mountedRef = useRef(true)
   const hasInitializedRef = useRef(false)
-  const authListenerRef = useRef<any>(null)
 
-  useEffect(() => {
-    mountedRef.current = true
+  // Enhanced initialization function with better error handling
+  const initializeAuth = useCallback(async () => {
+    // Skip if this instance already initialized or unmounted
+    if (hasInitializedRef.current || !mountedRef.current) return
     
-    // Prevent multiple initializations globally
+    // Skip if global initialization is in progress or was recently completed
     const now = Date.now()
-    if (globalInitState.isInitializing || (globalInitState.isInitialized && (now - globalInitState.lastInitTime) < 5000)) {
+    if (authState.isInitializing || (authState.isInitialized && now - authState.lastInitTime < 3000)) {
       console.log('Auth initialization skipped - already in progress or recently completed')
       setLoading(false)
       return
     }
-
-    // Prevent multiple initializations per component instance
-    if (hasInitializedRef.current) {
-      console.log('Auth already initialized for this component instance')
-      setLoading(false)
-      return
-    }
-
-    hasInitializedRef.current = true
-    globalInitState.isInitializing = true
-    globalInitState.lastInitTime = now
-
-    console.log('Starting auth initialization...')
-
-    const initializeAuth = async () => {
-      try {
-        // Set maximum timeout to prevent hanging
-        const timeoutId = setTimeout(() => {
-          console.warn('Auth initialization timeout')
-          if (mountedRef.current) {
-            setLoading(false)
-            globalInitState.isInitializing = false
-          }
-        }, 8000)
-
-        // Get initial session with timeout
-        const sessionPromise = supabase.auth.getSession()
-        const sessionResult = await Promise.race([
-          sessionPromise,
-          new Promise<any>((_, reject) => 
-            setTimeout(() => reject(new Error('Session fetch timeout')), 5000)
-          )
-        ])
-
-        clearTimeout(timeoutId)
-
-        const { data: { session }, error } = sessionResult
-
-        if (error) {
-          // Handle refresh token errors as expected scenarios rather than critical errors
-          if (error.message && error.message.includes('Invalid Refresh Token: Refresh Token Not Found')) {
-            console.log('Session expired - refresh token not found, user will need to sign in again')
-          } else {
-            console.error('Session error:', error)
-          }
-          
-          if (mountedRef.current) {
-            setLoading(false)
-            globalInitState.isInitializing = false
-          }
-          return
-        }
-
-        if (session?.user && mountedRef.current) {
-          console.log('Found existing session for:', session.user.email)
-          setUser(session.user)
-          await validateAdminUser(session.user)
-        } else if (mountedRef.current) {
-          console.log('No existing session found')
-          setLoading(false)
-          globalInitState.isInitializing = false
-          globalInitState.isInitialized = true
-        }
-      } catch (error) {
-        console.error('Auth initialization error:', error)
+    
+    try {
+      console.log('Starting auth initialization...')
+      hasInitializedRef.current = true
+      authState.isInitializing = true
+      
+      // Set timeout to prevent hanging
+      const timeoutId = setTimeout(() => {
+        console.warn('Auth initialization timeout')
         if (mountedRef.current) {
           setLoading(false)
-          globalInitState.isInitializing = false
+          authState.isInitializing = false
         }
+      }, 5000)
+      
+      // Get initial session
+      const { data: { session }, error } = await supabase.auth.getSession()
+      
+      clearTimeout(timeoutId)
+      
+      if (error) {
+        // Handle refresh token errors as expected scenarios rather than critical errors
+        if (error.message && error.message.includes('Invalid Refresh Token')) {
+          console.log('Session expired or invalid refresh token - user will need to sign in again')
+        } else {
+          console.error('Session error:', error)
+        }
+        
+        if (mountedRef.current) {
+          setLoading(false)
+        }
+      } else if (session?.user && mountedRef.current) {
+        console.log('Found existing session for:', session.user.email)
+        setUser(session.user)
+        await validateAdminUser(session.user)
+      } else if (mountedRef.current) {
+        console.log('No existing session found')
+        setLoading(false)
+      }
+      
+      // Setup auth state listener only once globally
+      if (!authState.authChangeListeners.size) {
+        setupAuthListener()
+      }
+      
+      authState.isInitializing = false
+      authState.isInitialized = true
+      authState.lastInitTime = Date.now()
+      
+    } catch (error) {
+      console.error('Auth initialization error:', error)
+      if (mountedRef.current) {
+        setLoading(false)
+        authState.isInitializing = false
       }
     }
+  }, [setAuthenticated]) // Include setAuthenticated in dependencies
 
-    // Set up auth state listener (only once)
-    if (!authListenerRef.current) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
-          if (!mountedRef.current) return
-
-          console.log('Auth state change:', event, session?.user?.email)
-          
-          try {
-            if (event === 'SIGNED_IN' && session?.user) {
-              setUser(session.user)
-              await validateAdminUser(session.user)
-            } else if (event === 'SIGNED_OUT') {
-              setUser(null)
-              setAdminUser(null)
-              setAuthenticated(false)
-              if (mountedRef.current) {
-                setLoading(false)
-              }
-            }
-          } catch (error) {
-            console.error('Error handling auth state change:', error)
+  // Setup auth state listener
+  const setupAuthListener = () => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.email)
+        
+        try {
+          if (event === 'SIGNED_IN' && session?.user) {
+            setUser(session.user)
+            await validateAdminUser(session.user)
+          } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+            setUser(null)
+            setAdminUser(null)
+            setAuthenticated(false)
             if (mountedRef.current) {
               setLoading(false)
             }
           }
+        } catch (error) {
+          console.error('Error handling auth state change:', error)
+          if (mountedRef.current) {
+            setLoading(false)
+          }
         }
-      )
-
-      authListenerRef.current = subscription
-    }
-
-    // Start initialization
-    initializeAuth()
-
-    // Cleanup function
-    return () => {
-      console.log('Cleaning up auth hook')
-      mountedRef.current = false
-      
-      if (authListenerRef.current) {
-        authListenerRef.current.unsubscribe()
-        authListenerRef.current = null
       }
+    )
+    
+    // Add to global listener set for tracking
+    authState.authChangeListeners.add(subscription)
+    
+    // Return unsubscribe function
+    return () => {
+      subscription.unsubscribe()
+      authState.authChangeListeners.delete(subscription)
     }
-  }, []) // Remove all dependencies to prevent re-initialization
+  }
 
   const validateAdminUser = async (user: User) => {
     if (!mountedRef.current) return
@@ -172,7 +150,6 @@ export const useAuth = () => {
         console.error('Admin validation error:', error)
         if (mountedRef.current) {
           setLoading(false)
-          globalInitState.isInitializing = false
         }
         return
       }
@@ -224,23 +201,31 @@ export const useAuth = () => {
         setAdminUser(admin)
         
         // Use store setter directly to avoid dependency issues
-        const store = useStore.getState()
-        store.setAuthenticated(true, admin)
+        setAuthenticated(true, admin)
       }
       
       if (mountedRef.current) {
         setLoading(false)
-        globalInitState.isInitializing = false
-        globalInitState.isInitialized = true
       }
     } catch (error) {
       console.error('Error validating admin user:', error)
       if (mountedRef.current) {
         setLoading(false)
-        globalInitState.isInitializing = false
       }
     }
   }
+
+  // Setup effect - runs once on component mount
+  useEffect(() => {
+    // Initialize auth
+    initializeAuth()
+    
+    // Cleanup function
+    return () => {
+      console.log('Cleaning up auth hook')
+      mountedRef.current = false
+    }
+  }, [initializeAuth]) // Add initializeAuth as a dependency since it's memoized
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -301,14 +286,10 @@ export const useAuth = () => {
       
       setUser(null)
       setAdminUser(null)
+      setAuthenticated(false)
       
-      // Use store setter directly
-      const store = useStore.getState()
-      store.setAuthenticated(false)
-      
-      // Reset global state
-      globalInitState.isInitialized = false
-      globalInitState.isInitializing = false
+      // Reset initialization state for this instance
+      hasInitializedRef.current = false
       
       console.log('Sign out successful')
     } catch (error: any) {

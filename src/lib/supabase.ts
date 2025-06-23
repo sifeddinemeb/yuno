@@ -11,8 +11,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 console.log('Initializing Supabase client...')
-console.log('URL:', supabaseUrl)
 
+// Create a single, persistent Supabase client instance
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
@@ -24,19 +24,45 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     headers: {
       'X-Client-Info': 'yuno-frontend'
     }
+  },
+  // Add more resilient error handling and retry logic
+  httpOptions: {
+    fetch: (url, options) => {
+      // Custom fetch implementation with timeout
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout')), 10000)
+      })
+      
+      return Promise.race([
+        fetch(url, options),
+        timeoutPromise
+      ]) as Promise<Response>
+    }
   }
 })
 
-// Test connection
-supabase.auth.getSession().then(({ data, error }) => {
-  if (error) {
-    console.error('Supabase connection test failed:', error)
-  } else {
-    console.log('Supabase connection successful')
-  }
-}).catch(err => {
-  console.error('Supabase connection error:', err)
-})
+// Test connection with better error handling
+supabase.auth.getSession()
+  .then(({ data, error }) => {
+    if (error) {
+      // Handle common initialization errors
+      if (error.message && error.message.includes('Invalid Refresh Token')) {
+        console.log('No active session found, user will need to sign in')
+      } else {
+        console.warn('Supabase connection test:', error)
+      }
+    } else {
+      console.log('Supabase connection successful')
+      if (data.session) {
+        console.log('Active session found for user:', data.session.user.email)
+      } else {
+        console.log('No active session found')
+      }
+    }
+  })
+  .catch(err => {
+    console.error('Supabase connection error:', err)
+  })
 
 // Database types for TypeScript
 export interface Database {

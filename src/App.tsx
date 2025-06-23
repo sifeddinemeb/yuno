@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { ErrorBoundary } from 'react-error-boundary';
+import { useCallback, useTransition } from 'react';
 import NetworkErrorHandler from './components/ui/NetworkErrorHandler/NetworkErrorHandler';
 import FeedbackForm from './components/ui/FeedbackForm/FeedbackForm';
 import ThemeProvider from './components/layout/ThemeProvider/ThemeProvider';
@@ -18,6 +19,14 @@ import Settings from './pages/admin/Settings/Settings';
 
 function App() {
   const { adminUser, loading } = useAuth();
+  const [isPending, startTransition] = useTransition();
+
+  // Wrap navigation updates in startTransition to avoid throttling warnings
+  const transitionNavigation = useCallback((callback: () => void) => {
+    startTransition(() => {
+      callback();
+    });
+  }, [startTransition]);
 
   // Show loading spinner while checking authentication
   if (loading) {
@@ -53,7 +62,7 @@ function App() {
     <ThemeProvider>
       <ErrorBoundary>
         <NetworkErrorHandler retryFn={() => Promise.resolve()}>
-          <Router>
+          <Router future={{ v7_startTransition: true }}>
             <div className="min-h-screen transition-colors duration-300">
               <Routes>
                 {/* Public Routes */}

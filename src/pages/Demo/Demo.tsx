@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useTransition } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Play, 
@@ -9,16 +11,24 @@ import {
   Zap,
   Shield
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import Card from '../../components/ui/Card/Card';
 import ThemeToggle from '../../components/ui/ThemeToggle/ThemeToggle';
 import YunoWidget from '../../components/widget/YunoWidget/YunoWidget';
 
 const Demo = () => {
+  const navigate = useNavigate();
+  const [isPending, startTransition] = useTransition();
   const [completedChallenges, setCompletedChallenges] = useState(0);
   const [currentDemo, setCurrentDemo] = useState(0);
   const [isVerified, setIsVerified] = useState(false);
+
+  const handleNavigation = (path: string) => {
+    // Wrap navigation in startTransition to avoid throttling warnings
+    startTransition(() => {
+      navigate(path);
+    });
+  };
 
   const demoSteps = [
     {
@@ -81,12 +91,25 @@ const Demo = () => {
               </span>
             </Link>
             <div className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-secondary hover:text-primary transition-colors">Vision</Link>
-              <Link to="/impact" className="text-secondary hover:text-primary transition-colors">Impact</Link>
+              <button 
+                onClick={() => handleNavigation('/')} 
+                className="text-secondary hover:text-primary transition-colors bg-transparent border-none"
+              >
+                Vision
+              </button>
+              <button 
+                onClick={() => handleNavigation('/impact')} 
+                className="text-secondary hover:text-primary transition-colors bg-transparent border-none"
+              >
+                Impact
+              </button>
               <Link to="/demo" className="text-neon-blue font-semibold">Demo</Link>
-              <Link to="/auth/login">
+              <button 
+                onClick={() => handleNavigation('/auth/login')}
+                disabled={isPending}
+              >
                 <Button size="sm">Get Started</Button>
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -294,24 +317,31 @@ const Demo = () => {
             </p>
 
             <Card variant="glass" className="text-left mb-8">
-              <div className="bg-dark-200 rounded-lg p-4 font-mono text-sm overflow-x-auto">
-                <div className="text-gray-400 mb-2">// HTML Integration</div>
-                <div className="text-neon-blue">&lt;script</div>
-                <div className="text-white ml-4">src="https://cdn.yuno.ai/widget.js"</div>
-                <div className="text-neon-blue">&gt;&lt;/script&gt;</div>
-                <div className="text-neon-blue mt-2">&lt;div</div>
-                <div className="text-white ml-4">id="yuno-widget"</div>
-                <div className="text-white ml-4">data-api-key="your_api_key"</div>
-                <div className="text-neon-blue">&gt;&lt;/div&gt;</div>
+              <div className="bg-dark-200 rounded-lg p-4 overflow-x-auto">
+                <pre className="font-mono text-sm">
+                  <code>
+                    <div className="text-gray-400">// HTML Integration</div>
+                    <div className="text-neon-blue">&lt;script</div>
+                    <div className="text-white ml-4">src="https://cdn.yuno.ai/widget.js"</div>
+                    <div className="text-neon-blue">&gt;&lt;/script&gt;</div>
+                    <div className="text-neon-blue mt-2">&lt;div</div>
+                    <div className="text-white ml-4">id="yuno-widget"</div>
+                    <div className="text-white ml-4">data-api-key="your_api_key"</div>
+                    <div className="text-neon-blue">&gt;&lt;/div&gt;</div>
+                  </code>
+                </pre>
               </div>
             </Card>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/auth/login">
+              <button 
+                onClick={() => handleNavigation('/auth/login')} 
+                disabled={isPending}
+              >
                 <Button size="lg" className="px-8">
                   Get API Key <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
-              </Link>
+              </button>
               <Button variant="secondary" size="lg" className="px-8">
                 View Documentation
               </Button>
@@ -323,4 +353,4 @@ const Demo = () => {
   );
 };
 
-export default Demo;
+export default Impact;

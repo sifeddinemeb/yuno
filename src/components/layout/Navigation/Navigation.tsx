@@ -1,12 +1,14 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, BarChart3, Settings, Key, Puzzle as PuzzlePiece, LogOut, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
 import Button from '../../ui/Button/Button';
 import ThemeToggle from '../../ui/ThemeToggle/ThemeToggle';
 
 const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isPending, startTransition] = useTransition();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { signOut, adminUser } = useAuth();
 
@@ -21,6 +23,16 @@ const Navigation = () => {
   const handleLogout = async () => {
     await signOut();
     // Navigation will be handled by the auth state change
+  };
+
+  const handleNavigation = (href: string) => {
+    // Use React 18's startTransition for navigation to avoid throttling warnings
+    startTransition(() => {
+      navigate(href);
+      if (isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    });
   };
 
   return (
@@ -79,16 +91,16 @@ const Navigation = () => {
             const isActive = location.pathname === item.href;
             
             return (
-              <Link
+              <button
                 key={item.name}
-                to={item.href}
-                className={`nav-link ${isActive ? 'active' : ''}`} 
+                className={`nav-link ${isActive ? 'active' : ''} w-full text-left`} 
                 aria-current={isActive ? 'page' : undefined}
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={() => handleNavigation(item.href)}
+                disabled={isPending}
               >
                 <Icon className="w-5 h-5" />
                 <span className="font-medium">{item.name}</span>
-              </Link>
+              </button>
             );
           })}
         </nav>

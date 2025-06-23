@@ -22,10 +22,7 @@
     "framer-motion": "^10.18.0",
     "zustand": "^4.4.7",
     "@supabase/supabase-js": "^2.38.4",
-    "ml-kmeans": "^6.0.0",
-    "ml-matrix": "^6.10.4",
     "@fingerprintjs/fingerprintjs": "^4.0.0",
-    "ml-distance": "^4.0.0",
    "marked": "^11.1.0",
    "react-error-boundary": "^4.0.11",
    "focus-trap-react": "^10.2.3"

@@ -1,4 +1,6 @@
 import { motion } from 'framer-motion';
+import { useNavigate, Link } from 'react-router-dom';
+import { useTransition } from 'react';
 import { 
   Brain, 
   Shield, 
@@ -12,12 +14,21 @@ import {
   Lock,
   Sparkles
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import Card from '../../components/ui/Card/Card';
 import ThemeToggle from '../../components/ui/ThemeToggle/ThemeToggle';
 
 const Impact = () => {
+  const navigate = useNavigate();
+  const [isPending, startTransition] = useTransition();
+  
+  const handleNavigation = (path: string) => {
+    // Wrap navigation in startTransition to avoid throttling warnings
+    startTransition(() => {
+      navigate(path);
+    });
+  };
+
   const impactStats = [
     { label: 'AI Models Improved', value: '2,847', icon: Brain, color: 'text-neon-blue' },
     { label: 'Bots Detected', value: '1.2M+', icon: Shield, color: 'text-neon-red' },
@@ -76,12 +87,22 @@ const Impact = () => {
               </span>
             </Link>
             <div className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-secondary hover:text-primary transition-colors">Vision</Link>
+              <button 
+                onClick={() => handleNavigation('/')} 
+                className="text-secondary hover:text-primary transition-colors bg-transparent border-none"
+              >
+                Vision
+              </button>
               <Link to="/impact" className="text-neon-blue font-semibold">Impact</Link>
-              <Link to="/demo" className="text-secondary hover:text-primary transition-colors">Demo</Link>
-              <Link to="/auth/login">
+              <button 
+                onClick={() => handleNavigation('/demo')} 
+                className="text-secondary hover:text-primary transition-colors bg-transparent border-none"
+              >
+                Demo
+              </button>
+              <button onClick={() => handleNavigation('/auth/login')}>
                 <Button size="sm">Get Started</Button>
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -255,16 +276,22 @@ const Impact = () => {
               Every verification makes a difference.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/demo">
+              <button 
+                onClick={() => handleNavigation('/demo')} 
+                disabled={isPending}
+              >
                 <Button size="lg" className="px-8">
                   Try Live Demo <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
-              </Link>
-              <Link to="/auth/login">
+              </button>
+              <button 
+                onClick={() => handleNavigation('/auth/login')} 
+                disabled={isPending}
+              >
                 <Button variant="secondary" size="lg" className="px-8">
                   Get Started
                 </Button>
-              </Link>
+              </button>
             </div>
           </motion.div>
         </div>
