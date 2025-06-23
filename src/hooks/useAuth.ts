@@ -76,7 +76,13 @@ export const useAuth = () => {
         const { data: { session }, error } = sessionResult
 
         if (error) {
-          console.error('Session error:', error)
+          // Handle refresh token errors as expected scenarios rather than critical errors
+          if (error.message && error.message.includes('Invalid Refresh Token: Refresh Token Not Found')) {
+            console.log('Session expired - refresh token not found, user will need to sign in again')
+          } else {
+            console.error('Session error:', error)
+          }
+          
           if (mountedRef.current) {
             setLoading(false)
             globalInitState.isInitializing = false
