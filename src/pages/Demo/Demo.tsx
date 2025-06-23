@@ -321,13 +321,13 @@ const Demo = () => {
                 <pre className="font-mono text-sm">
                   <code>
                     <div className="text-gray-400">// HTML Integration</div>
-                    <div className="text-neon-blue"><script</div>
+                    <div className="text-neon-blue">&lt;script</div>
                     <div className="text-white ml-4">src="https://cdn.yuno.ai/widget.js"</div>
-                    <div className="text-neon-blue">></script></div>
-                    <div className="text-neon-blue mt-2"><div</div>
+                    <div className="text-neon-blue">&gt;&lt;/script&gt;</div>
+                    <div className="text-neon-blue mt-2">&lt;div</div>
                     <div className="text-white ml-4">id="yuno-widget"</div>
                     <div className="text-white ml-4">data-api-key="your_api_key"</div>
-                    <div className="text-neon-blue">></div></div>
+                    <div className="text-neon-blue">&gt;&lt;/div&gt;</div>
                   </code>
                 </pre>
               </div>
