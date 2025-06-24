@@ -1,0 +1,386 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply font-sans antialiased transition-colors duration-300;
+  }
+  
+  /* Dark mode styles */
+  .dark {
+    @apply bg-dark-100 text-white;
+    background-image: 
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0),
+      url('data:image/svg+xml,%3Csvg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.4"/%3E%3C/svg%3E');
+    background-size: 20px 20px, 200px 200px;
+  }
+  
+  /* Light mode styles */
+  .light {
+    @apply bg-gray-50 text-gray-900;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(0,0,0,0.1) 1px, transparent 0),
+      url('data:image/svg+xml,%3Csvg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.2"/%3E%3C/svg%3E');
+    background-size: 20px 20px, 200px 200px;
+  }
+  
+  /* Glassmorphism utility classes */
+  .glass {
+    @apply backdrop-blur-md border transition-all duration-300;
+  }
+  
+  .dark .glass {
+    @apply bg-white/10 border-white/20 shadow-lg shadow-black/25;
+  }
+  
+  .light .glass {
+    @apply bg-white/95 border-gray-200 shadow-lg shadow-gray-900/10;
+  }
+  
+  .glass-dark {
+    @apply backdrop-blur-md border transition-all duration-300;
+  }
+  
+  .dark .glass-dark {
+    @apply bg-black/30 border-white/10 shadow-lg shadow-black/50;
+  }
+  
+  .light .glass-dark {
+    @apply bg-gray-200/95 border-gray-300 shadow-lg shadow-gray-900/10;
+  }
+  
+  .glass-light {
+    @apply backdrop-blur-md border transition-all duration-300;
+  }
+  
+  .dark .glass-light {
+    @apply bg-white/5 border-white/10;
+  }
+  
+  .light .glass-light {
+    @apply bg-white/90 border-gray-200;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .dark ::-webkit-scrollbar-track {
+    @apply bg-dark-200;
+  }
+  
+  .light ::-webkit-scrollbar-track {
+    @apply bg-gray-200;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-dark-400 rounded-full;
+  }
+  
+  .light ::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 rounded-full;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb:hover {
+    @apply bg-dark-500;
+  }
+  
+  .light ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-neon-blue to-neon-purple text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-neon-blue/25 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply glass px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-glass-light hover:scale-105 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2;
+  }
+  
+  .dark .btn-secondary {
+    @apply text-white hover:bg-white/25;
+  }
+  
+  .light .btn-secondary {
+    @apply text-gray-800 hover:bg-white/80 hover:border-gray-300;
+  }
+  
+  .btn-ghost {
+    @apply text-neon-blue hover:text-neon-purple hover:bg-neon-blue/10 rounded-lg px-2 py-1 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2;
+  }
+  
+  .input-field {
+    @apply glass w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-transparent transition-all duration-300;
+  }
+  
+  .dark .input-field {
+    @apply text-white placeholder-gray-400;
+  }
+  
+  .light .input-field {
+    @apply text-gray-800 placeholder-gray-500 border-gray-200;
+  }
+  
+  .card {
+    @apply glass rounded-xl p-6 transition-all duration-300;
+  }
+  
+  .dark .card:hover {
+    @apply bg-white/15;
+  }
+  
+  .light .card:hover {
+    @apply bg-white/100 border-gray-300;
+  }
+  
+  .neon-glow {
+    @apply shadow-lg shadow-neon-blue/25;
+  }
+  
+  /* Navigation styles */
+  .nav-link {
+    @apply flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2;
+  }
+  
+  .dark .nav-link {
+    @apply text-gray-300 hover:text-white hover:bg-white/10;
+  }
+  
+  .light .nav-link {
+    @apply text-gray-700 hover:text-gray-900 hover:bg-gray-100;
+  }
+  
+  .nav-link.active {
+    @apply bg-gradient-to-r from-neon-blue/20 to-neon-purple/20 text-neon-blue border border-neon-blue/30;
+  }
+  
+  /* Text color utilities for better contrast */
+  .text-primary {
+    @apply transition-colors duration-200;
+  }
+  
+  .dark .text-primary {
+    @apply text-white;
+  }
+  
+  .light .text-primary {
+    @apply text-gray-900;
+  }
+  
+  .text-secondary {
+    @apply transition-colors duration-300;
+  }
+  
+  .dark .text-secondary {
+    @apply text-gray-300;
+  }
+  
+  .light .text-secondary {
+    @apply text-gray-800;
+  }
+  
+  .text-muted {
+    @apply transition-colors duration-300;
+  }
+  
+  .dark .text-muted {
+    @apply text-gray-400;
+  }
+  
+  .light .text-muted {
+    @apply text-gray-700;
+  }
+  
+  /* Animation utilities */
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  /* AI Generator specific styles */
+  .ai-generator-btn {
+    @apply bg-gradient-to-r from-neon-purple/20 to-neon-blue/20 border-neon-purple/30 text-neon-purple hover:bg-neon-purple/30 hover:border-neon-purple/50;
+  }
+  
+  .dark .ai-generator-btn {
+    @apply bg-gradient-to-r from-neon-purple/30 to-neon-blue/30 border-neon-purple/50 text-neon-purple hover:bg-neon-purple/40 hover:border-neon-purple/60;
+  }
+  
+  .light .ai-generator-btn {
+    @apply bg-gradient-to-r from-neon-purple/20 to-neon-blue/20 border-neon-purple/30 text-neon-purple hover:bg-neon-purple/30 hover:border-neon-purple/40;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -468px 0;
+    }
+    100% {
+      background-position: 468px 0;
+    }
+  }
+
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  .light .skeleton::after {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  }
+
+  .skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+  }
+
+  .skeleton-circle {
+    border-radius: 50%;
+  }
+
+  .skeleton-rect {
+    border-radius: 0.375rem;
+  }
+
+  .skeleton-card {
+    height: 12rem;
+    border-radius: 0.75rem;
+  }
+
+  .skeleton-button {
+    height: 2.5rem;
+    width: 8rem;
+    border-radius: 0.5rem;
+  }
+
+  .skeleton-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+  }
+
+  /* Focus styles for better accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-neon-blue ring-offset-2;
+  }
+  
+  /* Better overflow handling for modals */
+  .modal-overflow-container {
+    @apply overflow-auto max-h-[80vh] p-6;
+  }
+
+  /* Improved light mode selection */
+  .light ::selection {
+    @apply bg-neon-blue/30 text-gray-900;
+  }
+
+  .dark ::selection {
+    @apply bg-neon-blue/50 text-white;
+  }
+  /* Border utilities */
+  .border-primary {
+    @apply transition-colors duration-300;
+  }
+  
+  .dark .border-primary {
+    @apply border-gray-700;
+  }
+  
+  .light .border-primary {
+    @apply border-gray-300;
+  }
+  
+  .border-secondary {
+    @apply transition-colors duration-300;
+  }
+  
+  .dark .border-secondary {
+    @apply border-gray-800;
+  }
+  
+  .light .border-secondary {
+    @apply border-gray-200;
+  }
+}
+
+/* AI Generator specific styles */
+.ai-generator-btn {
+  @apply bg-gradient-to-r from-neon-purple/20 to-neon-blue/20 border-neon-purple/30 text-neon-purple hover:bg-neon-purple/30 hover:border-neon-purple/50;
+}
+
+.light .ai-generator-btn {
+  @apply bg-gradient-to-r from-neon-purple/15 to-neon-blue/15 border-neon-purple/30 text-neon-purple hover:bg-neon-purple/25 hover:border-neon-purple/40;
+}
+
+.dark .ai-generator-btn {
+  @apply bg-gradient-to-r from-neon-purple/30 to-neon-blue/30 border-neon-purple/50 text-neon-purple hover:bg-neon-purple/40 hover:border-neon-purple/60;
+}
+
+/* Prevent horizontal overflow issues */
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+.max-w-full {
+  max-width: 100% !important;
+}
+
+/* Improve table responsiveness */
+.table-container {
+  @apply w-full overflow-x-auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* Improve select element contrast in light theme */
+.light select.input-field {
+  @apply bg-white text-gray-800 border-gray-300;
+}
+
+.light select.input-field option {
+  @apply bg-white text-gray-800;
+}
+
+/* Ensure buttons have proper contrast in light theme */
+.light .btn-primary {
+  @apply text-white shadow-md;
+}
+
+.light .btn-ghost {
+  @apply text-neon-blue hover:text-neon-purple hover:bg-gray-100;
+}
+
+/* Fix tag visibility in light theme */
+.light .bg-gray-600\/30 {
+  @apply bg-gray-300;
+}
+
+.light .text-gray-300 {
+  @apply text-gray-700;
+}

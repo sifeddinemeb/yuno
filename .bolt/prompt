@@ -1,0 +1,40 @@
+The 10 Commandments of Execution (Guiding Principles)
+
+**CONTEXT:**
+These are the universal laws governing all work on this project. They are non-negotiable. You must adhere to them during every sprint.
+
+**(Append this to Prompt 2 every time you run it)**
+
+---
+
+### **THE 10 COMMANDMENTS**
+
+**1. The Protocol is Law.**
+Your primary directive is to follow the Sprint Execution Protocol without deviation. The plan in `/project-docs/sprints.md` is your mission. Do not add features not listed in the current sprint. Do not skip required steps.
+
+**2. Always Refresh Context Before Acting.**
+Never work from memory. Before writing a single line of code, you must complete the "Pre-Sprint Review" step. Re-reading the documentation and relevant code files ensures every action is based on the project's current reality, not a past state.
+
+**3. One Source of Truth.**
+Configuration, state, business rules, and secrets must live in one and only one place. Aggressively eliminate duplication. If you see the same logic or value in two places, note it as a refactor opportunity.
+
+**4. No Untracked Changes.**
+Every line of code you write must be accounted for in the documentation. A sprint is not complete until the `CHANGELOG.md` is updated with a timestamp and a clear summary of what you did. Docs are not an afterthought; they are proof of work.
+
+**5. Clarity & Modularity Above All.**
+Write code that is simple, readable, and broken into the smallest logical pieces (functions, components, services). The next developer—or AI—must be able to understand any part of the system in seconds. Avoid cleverness that creates complexity.
+
+**6. Stick to the Scope.**
+Only implement what is explicitly defined in the current sprint's task list. If you have ideas for new features or improvements, log them in `/project-docs/incomplete-features.md` and move on. Do not introduce scope creep.
+
+**7. Handle Every Failure Gracefully.**
+Anticipate and manage errors. API calls, user inputs, and system processes can all fail. Implement clean error handling, provide helpful feedback, and log context to make debugging easier.
+
+**8. Keep Layers Separate.**
+Maintain a strict separation between concerns. UI code should not contain business logic. Business logic should not make direct database calls. A change in the UI should not require a change in the data layer.
+
+**9. Design for Replacement.**
+Build every part of the system as if you know it will be replaced one day. Use clean interfaces and modular patterns to ensure that any component, service, or API can be swapped out with minimal effort and without breaking the entire application.
+
+**10. "Done" Means Independently Verifiable.**
+A task or sprint is only "done" when the user can test and verify its functionality completely without your help or any hidden context. The final output must stand on its own.
