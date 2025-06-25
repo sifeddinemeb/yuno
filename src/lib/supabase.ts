@@ -1,42 +1,56 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Use import.meta.env in browser and process.env in Node (tests)
+const rawEnv: any = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : process.env;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables')
-  console.error('VITE_SUPABASE_URL:', supabaseUrl ? 'Set' : 'Missing')
-  console.error('VITE_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Set' : 'Missing')
-  throw new Error('Missing Supabase environment variables')
+const supabaseUrl = rawEnv.VITE_SUPABASE_URL as string | undefined;
+const supabaseAnonKey = rawEnv.VITE_SUPABASE_ANON_KEY as string | undefined;
+
+export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
+
+if (!isSupabaseConfigured) {
+  console.warn('[Yuno] Supabase environment variables are missing. Running in limited mode.');
 }
 
-console.log('Initializing Supabase client...')
-console.log('URL:', supabaseUrl)
+// Create real client when configured, otherwise create a minimal stub to avoid runtime crashes.
+export const supabase: any = isSupabaseConfigured
+  ? createClient(supabaseUrl!, supabaseAnonKey!, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        flowType: 'pkce',
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'yuno-frontend',
+        },
+      },
+    })
+  : {
+      auth: {
+        getSession: async () => ({ data: { session: null }, error: { message: 'Supabase not configured' } }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+        signInWithPassword: async () => ({ data: {}, error: { message: 'Supabase not configured' } }),
+        signUp: async () => ({ data: {}, error: { message: 'Supabase not configured' } }),
+        signOut: async () => ({ error: { message: 'Supabase not configured' } }),
+      },
+    };
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'yuno-frontend'
+if (isSupabaseConfigured) {
+  console.log('Initializing Supabase client...');
+  console.log('URL:', supabaseUrl);
+
+  // Test connection (non-blocking)
+  supabase.auth.getSession().then(({ error }) => {
+    if (error) {
+      console.error('Supabase connection test failed:', error);
+    } else {
+      console.log('Supabase connection successful');
     }
-  }
-})
+  });
+}
 
-// Test connection
-supabase.auth.getSession().then(({ data, error }) => {
-  if (error) {
-    console.error('Supabase connection test failed:', error)
-  } else {
-    console.log('Supabase connection successful')
-  }
-}).catch(err => {
-  console.error('Supabase connection error:', err)
-})
 
 // Database types for TypeScript
 export interface Database {

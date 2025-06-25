@@ -12,7 +12,7 @@ import {
 import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import Card from '../../components/ui/Card/Card';
-import ThemeToggle from '../../components/ui/ThemeToggle/ThemeToggle';
+import PublicNavbar from '../../components/layout/PublicNavbar/PublicNavbar';
 import YunoWidget from '../../components/widget/YunoWidget/YunoWidget';
 
 const Demo = () => {
@@ -63,35 +63,7 @@ const Demo = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Theme Toggle */}
-      <div className="fixed top-4 right-4 z-50">
-        <ThemeToggle />
-      </div>
-
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-40 glass-dark">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-neon-blue to-neon-purple rounded-lg flex items-center justify-center">
-                <Brain className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
-                Yuno
-              </span>
-            </Link>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-secondary hover:text-primary transition-colors">Vision</Link>
-              <Link to="/impact" className="text-secondary hover:text-primary transition-colors">Impact</Link>
-              <Link to="/demo" className="text-neon-blue font-semibold">Demo</Link>
-              <Link to="/auth/login">
-                <Button size="sm">Get Started</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
+      <PublicNavbar />
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-32 pb-12 px-4">
         <div className="max-w-4xl mx-auto text-center">

@@ -1,6 +1,7 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react';
+import { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { User } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { useStore } from '../store/useStore'
 
 export interface AdminUser {
@@ -11,13 +12,36 @@ export interface AdminUser {
 }
 
 // Global state to prevent multiple simultaneous initializations
-let globalInitState = {
-  isInitializing: false,
-  isInitialized: false,
-  lastInitTime: 0
+interface GlobalInitState {
+  isInitializing: boolean;
+  isInitialized: boolean;
+  lastInitTime: number;
+  cachedAdmin?: AdminUser | null;
 }
 
+let globalInitState: GlobalInitState = {
+  isInitializing: false,
+  isInitialized: false,
+  lastInitTime: 0,
+  cachedAdmin: null,
+}
+
+// Prevent noisy console spam when many components mount
+let lastSkipLog = 0; // timestamp of last "skip" log
+
 export const useAuth = () => {
+  // If Supabase env vars are missing, short-circuit and expose an error state
+  if (!isSupabaseConfigured) {
+    return {
+      user: null,
+      adminUser: null,
+      loading: false,
+      envError: true,
+      signIn: async () => ({ success: false, error: 'Supabase not configured' }),
+      signUp: async () => ({ success: false, error: 'Supabase not configured' }),
+      signOut: async () => {},
+    } as const;
+  }
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<User | null>(null)
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null)
@@ -33,9 +57,16 @@ export const useAuth = () => {
     // Prevent multiple initializations globally
     const now = Date.now()
     if (globalInitState.isInitializing || (globalInitState.isInitialized && (now - globalInitState.lastInitTime) < 5000)) {
-      console.log('Auth initialization skipped - already in progress or recently completed')
-      setLoading(false)
-      return
+      // Throttle logs to once per second to avoid flooding the console
+      if (Date.now() - lastSkipLog > 1000) {
+        console.log('Auth initialization skipped - already in progress or recently completed');
+        lastSkipLog = Date.now();
+      }
+      if (loading) {
+        // Only update state if necessary to avoid extra rerenders
+        setLoading(false);
+      }
+      return;
     }
 
     // Prevent multiple initializations per component instance
@@ -87,7 +118,18 @@ export const useAuth = () => {
         if (session?.user && mountedRef.current) {
           console.log('Found existing session for:', session.user.email)
           setUser(session.user)
-          await validateAdminUser(session.user)
+
+          if (globalInitState.cachedAdmin && globalInitState.cachedAdmin.id === session.user.id) {
+            console.log('Using cached admin user')
+            setAdminUser(globalInitState.cachedAdmin)
+            const store = useStore.getState()
+            store.setAuthenticated(true, globalInitState.cachedAdmin)
+            setLoading(false)
+            globalInitState.isInitializing = false
+            globalInitState.isInitialized = true
+          } else {
+            await validateAdminUser(session.user)
+          }
         } else if (mountedRef.current) {
           console.log('No existing session found')
           setLoading(false)
@@ -106,7 +148,7 @@ export const useAuth = () => {
     // Set up auth state listener (only once)
     if (!authListenerRef.current) {
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
+        async (event: AuthChangeEvent, session: Session | null) => {
           if (!mountedRef.current) return
 
           console.log('Auth state change:', event, session?.user?.email)
@@ -216,7 +258,8 @@ export const useAuth = () => {
 
         console.log('Admin user validated:', admin)
         setAdminUser(admin)
-        
+        // Cache globally to reuse across mounts
+        globalInitState.cachedAdmin = admin
         // Use store setter directly to avoid dependency issues
         const store = useStore.getState()
         store.setAuthenticated(true, admin)
@@ -261,7 +304,7 @@ export const useAuth = () => {
     }
   }
 
-  const signUp = async (email: string, password: string, name: string) => {
+  const signUp = async (email: string, password: string, _name: string) => {
     try {
       console.log('Attempting sign up for:', email)
       

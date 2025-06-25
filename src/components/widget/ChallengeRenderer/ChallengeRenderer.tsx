@@ -141,6 +141,9 @@ const ChallengeRenderer = ({ challenge, onComplete }: ChallengeRendererProps) =>
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   disabled={isSubmitting}
+                  role="radio"
+                  aria-checked={selectedAnswer === option}
+                  aria-label={`Select sentiment option ${option}`}
                 >
                   {option}
                 </motion.button>

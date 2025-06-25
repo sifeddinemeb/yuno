@@ -19,6 +19,9 @@ interface YunoWidgetProps {
 }
 
 const YunoWidget = ({ onVerified, onFailed, onError, theme = 'auto' }: YunoWidgetProps) => {
+  // Accessibility: manage focus when state changes
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
   const [state, setState] = useState<'idle' | 'loading' | 'challenge' | 'success' | 'failed' | 'error'>('idle');
   const [sessionId, setSessionId] = useState<string>('');
   const [currentChallenge, setCurrentChallenge] = useState<Challenge | null>(null);
@@ -33,6 +36,18 @@ const YunoWidget = ({ onVerified, onFailed, onError, theme = 'auto' }: YunoWidge
   const interactionStartedRef = useRef<boolean>(false);
 
   const maxRetries = 3;
+
+  // Focus the container whenever the visual state changes for better screen-reader context
+  useEffect(() => {
+    if (containerRef.current) {
+      // Use preventScroll where supported to avoid page jump on mount
+      try {
+        (containerRef.current as HTMLElement).focus({ preventScroll: true } as any);
+      } catch {
+        containerRef.current.focus();
+      }
+    }
+  }, [state]);
 
   useEffect(() => {
     // Initialize session with enhanced fingerprinting
@@ -257,13 +272,15 @@ const YunoWidget = ({ onVerified, onFailed, onError, theme = 'auto' }: YunoWidge
       className="w-full max-w-md mx-auto"
       role="complementary"
       aria-label="Human verification widget"
+      ref={containerRef}
+      tabIndex={-1}
     >
       <BehaviorTracker 
         sessionId={sessionId} 
         isActive={state === 'challenge' || state === 'idle'}
       >
         <motion.div
-          className="glass rounded-xl p-6 min-h-[320px] flex flex-col justify-center items-center"
+          className="glass-real rounded-xl p-6 min-h-[320px] flex flex-col justify-center items-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}

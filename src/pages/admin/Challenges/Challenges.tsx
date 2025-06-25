@@ -40,21 +40,8 @@ import {
 } from '../../../lib/challenge-content';
 import { getChallengeAnalytics } from '../../../lib/analytics-tracking';
 import { GeneratedContent } from '../../../lib/gemini-api';
+import type { Challenge } from '../../../types';
 
-interface Challenge {
-  id: string;
-  type: string;
-  title: string;
-  description: string;
-  content: any;
-  correct_answer: any;
-  signal_tags: string[];
-  input_mode: string;
-  difficulty: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
 
 interface ChallengeAnalytics {
   challengeId: string;
@@ -117,32 +104,33 @@ const Challenges = () => {
     loadChallenges();
   }, []);
 
+  useEffect(() => {
+    loadAnalytics();
+  }, [challenges]);
+
+  // Fetch analytics for the first 10 challenges to avoid heavy loads
+  const loadAnalytics = async () => {
+    if (!challenges.length) return;
+    try {
+      const ids = challenges.slice(0, 10).map(c => c.id);
+      const analyticsData = await getChallengeAnalytics(ids);
+      // Shape analytics into lookup record
+      const analyticsMap: Record<string, ChallengeAnalytics> = {};
+      analyticsData.forEach((a: any) => {
+        analyticsMap[a.challengeId] = a as ChallengeAnalytics;
+      });
+      setChallengeAnalytics(analyticsMap);
+    } catch (err) {
+      console.error('Error loading analytics:', err);
+    }
+  };
+
   const loadChallenges = async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await challengeApi.getAll();
       setChallenges(data || []);
-
-      // Load analytics for active challenges
-      if (data) {
-        const analyticsPromises = data
-          .filter(c => c.is_active)
-          .slice(0, 10) // Limit to prevent too many API calls
-          .map(async (challenge) => {
-            try {
-              const analytics = await getChallengeAnalytics(challenge.id);
-              return analytics ? { [challenge.id]: analytics } : {};
-            } catch (err) {
-              console.warn(`Failed to load analytics for challenge ${challenge.id}:`, err);
-              return {};
-            }
-          });
-
-        const analyticsResults = await Promise.all(analyticsPromises);
-        const analyticsMap = analyticsResults.reduce((acc, result) => ({ ...acc, ...result }), {});
-        setChallengeAnalytics(analyticsMap);
-      }
     } catch (err: any) {
       console.error('Error loading challenges:', err);
       setError(err.message || 'Failed to load challenges');

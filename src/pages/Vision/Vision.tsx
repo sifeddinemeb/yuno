@@ -1,43 +1,15 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Shield, Brain, Zap, CheckCircle, Users, TrendingUp } from 'lucide-react';
+import { ArrowRight, Shield, Brain, Zap, CheckCircle, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import Card from '../../components/ui/Card/Card';
-import ThemeToggle from '../../components/ui/ThemeToggle/ThemeToggle';
+import PublicNavbar from '../../components/layout/PublicNavbar/PublicNavbar';
 import YunoWidget from '../../components/widget/YunoWidget/YunoWidget';
 
 const Vision = () => {
   return (
-    <div className="min-h-screen">
-      {/* Theme Toggle */}
-      <div className="fixed top-4 right-4 z-50">
-        <ThemeToggle />
-      </div>
-
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-40 glass-dark">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-neon-blue to-neon-purple rounded-lg flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
-                Yuno
-              </span>
-            </Link>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-neon-blue font-semibold">Vision</Link>
-              <Link to="/impact" className="text-secondary hover:text-primary transition-colors">Impact</Link>
-              <Link to="/demo" className="text-secondary hover:text-primary transition-colors">Demo</Link>
-              <Link to="/auth/login">
-                <Button size="sm">Get Started</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
+    <div>
+      <PublicNavbar />
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-32 pb-20 px-4">
         <div className="max-w-7xl mx-auto">
@@ -56,13 +28,14 @@ const Vision = () => {
               </h1>
             </div>
             
-            <h2 className="text-3xl md:text-5xl font-bold text-primary mb-6">
-              The Internet's Human Intelligence Layer
+            <h2 className="text-4xl md:text-6xl font-extrabold mb-6">
+              Stop Annoying Users.<br className="hidden md:block" />
+              <span className="bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">Start Fueling AI.</span>
             </h2>
             
-            <p className="text-xl text-muted max-w-3xl mx-auto mb-8">
-              Transform verification friction into AI fuel. Yuno replaces frustrating CAPTCHAs with 
-              delightful micro-challenges that verify humanity while training tomorrow's AI.
+            <p className="text-lg md:text-xl text-muted max-w-3xl mx-auto mb-8">
+              Frustrating CAPTCHAs waste <span className="font-semibold">500 years</span> of human time every single day. Yuno replaces those aggravating puzzles with 
+delightful micro-challenges that delight users while training tomorrow's AI.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -84,6 +57,26 @@ const Vision = () => {
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-neon-blue/10 rounded-full blur-3xl animate-float"></div>
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-neon-purple/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+        </div>
+      </section>
+
+      {/* Metrics Banner */}
+      <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <Card variant="glass">
+              <h3 className="text-4xl font-extrabold text-primary">4.5B</h3>
+              <p className="text-muted mt-2">CAPTCHAs solved each day</p>
+            </Card>
+            <Card variant="glass">
+              <h3 className="text-4xl font-extrabold text-primary">40%</h3>
+              <p className="text-muted mt-2">Avg. conversion loss</p>
+            </Card>
+            <Card variant="glass">
+              <h3 className="text-4xl font-extrabold text-primary">85%</h3>
+              <p className="text-muted mt-2">Users abandon forms</p>
+            </Card>
+          </div>
         </div>
       </section>
 

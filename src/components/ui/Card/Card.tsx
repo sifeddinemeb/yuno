@@ -2,7 +2,7 @@ import { HTMLAttributes, forwardRef } from 'react';
 import { clsx } from 'clsx';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'glass' | 'glow';
+  variant?: 'default' | 'glass' | 'glass-lite' | 'glow';
 }
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
@@ -12,7 +12,8 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         ref={ref}
         className={clsx('rounded-xl transition-all duration-300', {
           'card': variant === 'default',
-          'glass p-6 hover:bg-glass-light': variant === 'glass',
+          'glass-real p-6 hover:bg-white/10 dark:hover:bg-white/20': variant === 'glass',
+          'glass-lite p-6': variant === 'glass-lite',
           'card neon-glow': variant === 'glow',
         }, className)}
         {...props}
