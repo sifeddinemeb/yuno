@@ -7,6 +7,7 @@ import FeedbackForm from './components/ui/FeedbackForm/FeedbackForm';
 import ThemeProvider from './components/layout/ThemeProvider/ThemeProvider';
 import BackgroundBlobs from './components/layout/BackgroundBlobs/BackgroundBlobs';
 import ScrollToTop from './components/layout/ScrollToTop/ScrollToTop';
+import { BoltNewBadge } from '@/components/ui/bolt-new-badge';
 
 // Generic error fallback for all boundaries
 const errorFallback = ({ error }: { error: Error }) => (
@@ -27,15 +28,15 @@ import ApiKeys from './pages/admin/ApiKeys/ApiKeys';
 import Settings from './pages/admin/Settings/Settings';
 
 function App() {
-  const { adminUser, loading, envError } = useAuth() as any;
+  const { adminUser, envError, authReady } = useAuth() as any;
 
   if (envError) {
     return <MissingEnvScreen />;
   }
   
 
-  // Show loading spinner while checking authentication
-  if (loading) {
+  // Show loading spinner while checking authentication with progressive status hints
+  if (!authReady) {
     return (
       <ThemeProvider>
         <BackgroundBlobs />
@@ -43,7 +44,18 @@ function App() {
           <div className="flex flex-col items-center space-y-4 max-w-md">
             <div className="w-12 h-12 border-4 border-neon-blue border-t-transparent rounded-full animate-spin"></div>
             <span className="text-lg text-white">Loading Yuno...</span>
-            <span className="text-sm text-gray-400">Initializing authentication</span>
+            {/* progressive steps */}
+            {(() => {
+              const steps = [
+                'Initializing app',
+                'Connecting to Supabase',
+                'Validating session',
+                'Fetching admin data',
+                'Preparing dashboard'
+              ];
+              const step = steps[Math.min(Math.floor(Date.now() / 1500) % steps.length, steps.length - 1)];
+              return <span className="text-sm text-gray-400">{step}...</span>;
+            })()}
             
             {/* Debug info in development */}
             {process.env.NODE_ENV === 'development' && (
@@ -150,6 +162,11 @@ function App() {
                 />
               )}
             </div>
+            <BoltNewBadge 
+              position="bottom-left" 
+              variant="auto" 
+              size="medium"
+            />
           </Router>
         </NetworkErrorHandler>
       </ErrorBoundary>

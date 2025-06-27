@@ -45,6 +45,8 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<User | null>(null)
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null)
+  // authReady means auth process finished (either logged out or admin loaded)
+  const authReady = !loading && (!user || !!adminUser);
   const { setAuthenticated } = useStore()
   
   const mountedRef = useRef(true)
@@ -152,6 +154,11 @@ export const useAuth = () => {
           if (!mountedRef.current) return
 
           console.log('Auth state change:', event, session?.user?.email)
+
+          // Ignore silent refresh/update events to avoid triggering the loading spinner loop
+          if (event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+            return;
+          }
           
           try {
             if (event === 'SIGNED_IN' && session?.user) {
@@ -357,6 +364,7 @@ export const useAuth = () => {
     user,
     adminUser,
     loading,
+    authReady,
     signIn,
     signUp,
     signOut

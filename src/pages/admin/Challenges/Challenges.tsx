@@ -54,6 +54,9 @@ interface ChallengeAnalytics {
 }
 
 const Challenges = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -537,157 +540,273 @@ const Challenges = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredChallenges.map((challenge) => {
-                  const analytics = challengeAnalytics[challenge.id];
-                  return (
-                    <tr key={challenge.id} className="border-b border-gray-800 hover:bg-glass-light transition-colors">
-                      <td className="py-3 px-4">
-                        <input
-                          type="checkbox"
-                          checked={selectedChallenges.includes(challenge.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedChallenges([...selectedChallenges, challenge.id]);
-                            } else {
-                              setSelectedChallenges(selectedChallenges.filter(id => id !== challenge.id));
-                            }
-                          }}
-                        />
-                      </td>
-                      <td className="py-3 px-4">
+                {filteredChallenges.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-12 text-center">
+                      {challenges.length === 0 ? (
                         <div>
-                          <div className="font-semibold">{challenge.title}</div>
-                          <div className="text-sm text-muted truncate max-w-xs">
-                            {challenge.description}
-                          </div>
-                          {challenge.signal_tags && challenge.signal_tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {challenge.signal_tags.slice(0, 3).map((tag, index) => (
-                                <span key={index} className="px-1 py-0.5 bg-gray-600/30 text-gray-300 rounded text-xs">
-                                  {tag}
-                                </span>
-                              ))}
-                              {challenge.signal_tags.length > 3 && (
-                                <span className="text-xs text-muted">+{challenge.signal_tags.length - 3} more</span>
+                          <FileText className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                          <h3 className="text-lg font-medium mb-2">No challenges created yet</h3>
+                          <p className="text-sm mb-4">Get started by creating your first challenge or using the quick generate options above.</p>
+                          <Button onClick={() => setShowCreateModal(true)}>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Create First Challenge
+                          </Button>
+                        </div>
+                      ) : (
+                        <div>
+                          <Search className="w-8 h-8 text-gray-500 mx-auto mb-2" />
+                          <p>No challenges match your current filters</p>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ) : (
+                  // Paginated challenges
+                  filteredChallenges
+                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                    .map((challenge) => {
+                      const analytics = challengeAnalytics[challenge.id];
+                      return (
+                        <tr key={challenge.id} className="border-b border-gray-800 hover:bg-glass-light transition-colors">
+                          <td className="py-3 px-4">
+                            <input
+                              type="checkbox"
+                              checked={selectedChallenges.includes(challenge.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedChallenges([...selectedChallenges, challenge.id]);
+                                } else {
+                                  setSelectedChallenges(selectedChallenges.filter(id => id !== challenge.id));
+                                }
+                              }}
+                            />
+                          </td>
+                          <td className="py-3 px-4">
+                            <div>
+                              <div className="font-semibold">{challenge.title}</div>
+                              <div className="text-sm text-muted truncate max-w-xs">
+                                {challenge.description}
+                              </div>
+                              {challenge.signal_tags && challenge.signal_tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {challenge.signal_tags.slice(0, 3).map((tag, index) => (
+                                    <span key={index} className="px-1 py-0.5 bg-gray-600/30 text-gray-300 rounded text-xs">
+                                      {tag}
+                                    </span>
+                                  ))}
+                                  {challenge.signal_tags.length > 3 && (
+                                    <span className="text-xs text-muted">+{challenge.signal_tags.length - 3} more</span>
+                                  )}
+                                </div>
                               )}
                             </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded text-sm ${getChallengeTypeColor(challenge.type)}`}>
-                          {challenge.type}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded text-sm ${
-                          challenge.is_active 
-                            ? 'bg-neon-green/20 text-neon-green' 
-                            : 'bg-gray-600/20 text-gray-400'
-                        }`}>
-                          {challenge.is_active ? 'Active' : 'Draft'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded text-sm ${getDifficultyColor(challenge.difficulty)}`}>
-                          {challenge.difficulty}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        {analytics ? (
-                          <div className="text-sm">
-                            <div className="flex items-center space-x-2">
-                              <TrendingUp className="w-3 h-3 text-neon-green" />
-                              <span>{analytics.completionRate.toFixed(1)}%</span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className={`px-2 py-1 rounded text-sm ${getChallengeTypeColor(challenge.type)}`}>
+                              {challenge.type}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className={`px-2 py-1 rounded text-sm ${
+                              challenge.is_active 
+                                ? 'bg-neon-green/20 text-neon-green' 
+                                : 'bg-gray-600/20 text-gray-400'
+                            }`}>
+                              {challenge.is_active ? 'Active' : 'Draft'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className={`px-2 py-1 rounded text-sm ${getDifficultyColor(challenge.difficulty)}`}>
+                              {challenge.difficulty}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            {analytics ? (
+                              <div className="text-sm">
+                                <div className="flex items-center space-x-2">
+                                  <TrendingUp className="w-3 h-3 text-neon-green" />
+                                  <span>{analytics.completionRate.toFixed(1)}%</span>
+                                </div>
+                                <div className="text-xs text-muted">
+                                  {analytics.totalAttempts} attempts
+                                </div>
+                              </div>
+                            ) : challenge.is_active ? (
+                              <span className="text-xs text-muted">No data yet</span>
+                            ) : (
+                              <span className="text-xs text-muted">Not active</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-muted">
+                            {new Date(challenge.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex flex-wrap items-start space-x-2">
+                              <Button
+                                aria-label={`Preview ${challenge.title}`}
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setPreviewingChallenge(challenge)}
+                                title="Preview Challenge"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              {analytics && (
+                                <Button
+                                  aria-label={`View analytics for ${challenge.title}`}
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => setShowAnalytics(challenge.id)}
+                                  title="View Analytics"
+                                >
+                                  <BarChart3 className="w-4 h-4" />
+                                </Button>
+                              )}
+                              <Button
+                                aria-label={`Edit ${challenge.title}`}
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setEditingChallenge(challenge)}
+                                title="Edit Challenge"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                aria-label={challenge.is_active ? `Deactivate ${challenge.title}` : `Activate ${challenge.title}`}
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleUpdateChallenge(challenge.id, { is_active: !challenge.is_active })}
+                                title={challenge.is_active ? 'Deactivate' : 'Activate'}
+                              >
+                                {challenge.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                              </Button>
+                              <Button
+                                aria-label={`Delete ${challenge.title}`}
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDeleteChallenge(challenge.id)}
+                                title="Delete Challenge"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
                             </div>
-                            <div className="text-xs text-muted">
-                              {analytics.totalAttempts} attempts
-                            </div>
-                          </div>
-                        ) : challenge.is_active ? (
-                          <span className="text-xs text-muted">No data yet</span>
-                        ) : (
-                          <span className="text-xs text-muted">Not active</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 text-sm text-muted">
-                        {new Date(challenge.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex flex-wrap items-start space-x-2">
-                          <Button
-                            aria-label={`Preview ${challenge.title}`}
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setPreviewingChallenge(challenge)}
-                            title="Preview Challenge"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          {analytics && (
-                            <Button
-                              aria-label={`View analytics for ${challenge.title}`}
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setShowAnalytics(challenge.id)}
-                              title="View Analytics"
-                            >
-                              <BarChart3 className="w-4 h-4" />
-                            </Button>
-                          )}
-                          <Button
-                            aria-label={`Edit ${challenge.title}`}
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setEditingChallenge(challenge)}
-                            title="Edit Challenge"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            aria-label={challenge.is_active ? `Deactivate ${challenge.title}` : `Activate ${challenge.title}`}
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleUpdateChallenge(challenge.id, { is_active: !challenge.is_active })}
-                            title={challenge.is_active ? 'Deactivate' : 'Activate'}
-                          >
-                            {challenge.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </Button>
-                          <Button
-                            aria-label={`Delete ${challenge.title}`}
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDeleteChallenge(challenge.id)}
-                            title="Delete Challenge"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                          </td>
+                        </tr>
+                      );
+                    })
+                )}
               </tbody>
             </table>
             
-            {filteredChallenges.length === 0 && (
-              <div className="text-center py-12 text-muted">
-                {challenges.length === 0 ? (
-                  <div>
-                    <FileText className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No challenges created yet</h3>
-                    <p className="text-sm mb-4">Get started by creating your first challenge or using the quick generate options above.</p>
-                    <Button onClick={() => setShowCreateModal(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create First Challenge
+            {/* Pagination Controls */}
+            {filteredChallenges.length > 0 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 border-t border-gray-700">
+                <div className="text-sm text-gray-400 mb-2 sm:mb-0">
+                  Showing <span className="font-medium">
+                    {filteredChallenges.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}
+                  </span> to{' '}
+                  <span className="font-medium">
+                    {Math.min(currentPage * itemsPerPage, filteredChallenges.length)}
+                  </span>{' '}
+                  of <span className="font-medium">{filteredChallenges.length}</span> challenges
+                </div>
+                <div className="flex items-center space-x-2">
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1); // Reset to first page when changing items per page
+                    }}
+                    className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm"
+                  >
+                    <option value={5}>5 per page</option>
+                    <option value={10}>10 per page</option>
+                    <option value={25}>25 per page</option>
+                    <option value={50}>50 per page</option>
+                  </select>
+                  
+                  <div className="flex items-center space-x-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1}
+                      aria-label="First page"
+                      className="w-8 h-8 p-0 flex items-center justify-center"
+                    >
+                      «
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      aria-label="Previous page"
+                      className="w-8 h-8 p-0 flex items-center justify-center"
+                    >
+                      ‹
+                    </Button>
+                    
+                    {(() => {
+                      const totalPages = Math.ceil(filteredChallenges.length / itemsPerPage);
+                      const maxPageButtons = 5;
+                      const halfMaxButtons = Math.floor(maxPageButtons / 2);
+                      
+                      let startPage = Math.max(1, currentPage - halfMaxButtons);
+                      let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+                      
+                      if (endPage - startPage + 1 < maxPageButtons) {
+                        startPage = Math.max(1, endPage - maxPageButtons + 1);
+                      }
+                      
+                      const pages = [];
+                      for (let i = startPage; i <= endPage; i++) {
+                        pages.push(i);
+                      }
+                      
+                      return pages.map((pageNum) => (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? 'primary' : 'ghost'}
+                          size="sm"
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={`w-8 h-8 p-0 flex items-center justify-center ${
+                            currentPage === pageNum ? 'bg-neon-purple/20 text-neon-purple' : ''
+                          }`}
+                          aria-label={`Page ${pageNum}`}
+                          aria-current={currentPage === pageNum ? 'page' : undefined}
+                        >
+                          {pageNum}
+                        </Button>
+                      ));
+                    })()}
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCurrentPage(p => Math.min(
+                        Math.ceil(filteredChallenges.length / itemsPerPage), 
+                        p + 1
+                      ))}
+                      disabled={currentPage >= Math.ceil(filteredChallenges.length / itemsPerPage)}
+                      aria-label="Next page"
+                      className="w-8 h-8 p-0 flex items-center justify-center"
+                    >
+                      ›
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCurrentPage(Math.ceil(filteredChallenges.length / itemsPerPage))}
+                      disabled={currentPage >= Math.ceil(filteredChallenges.length / itemsPerPage) || filteredChallenges.length <= itemsPerPage}
+                      aria-label="Last page"
+                      className="w-8 h-8 p-0 flex items-center justify-center"
+                    >
+                      »
                     </Button>
                   </div>
-                ) : (
-                  <div>
-                    <Search className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-                    <p>No challenges match your current filters</p>
-                  </div>
-                )}
+                </div>
               </div>
             )}
           </div>
@@ -833,18 +952,21 @@ const Challenges = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-gray-900 rounded-xl p-8 max-w-2xl w-full mx-4 border border-gray-700"
               onClick={(e) => e.stopPropagation()}
             >
-              <div 
-                role="dialog" 
-                aria-label="Content generation settings"
-                className="glass rounded-xl w-full max-w-6xl max-h-[90vh] overflow-hidden border-2 border-neon-purple/30"
-              >
-                <div className="p-6 overflow-y-auto max-h-[calc(90vh-12px)]">
-                  <AIContentGenerator
-                    onContentGenerated={handleAIContentGenerated}
-                    onClose={() => setShowAIGenerator(false)}
-                  />
+              <div className="text-center">
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-neon-purple/10 mb-4">
+                  <Brain className="h-8 w-8 text-neon-purple" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">Coming Soon</h3>
+                <p className="text-gray-300 mb-6">
+                  AI Challenge Generation is under development. Please check back later!
+                </p>
+                <div className="mt-6">
+                  <Button onClick={() => setShowAIGenerator(false)}>
+                    Got it!
+                  </Button>
                 </div>
               </div>
             </motion.div>
