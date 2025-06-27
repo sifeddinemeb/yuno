@@ -2,14 +2,11 @@
   <h1>🧠 Yuno - The Internet's First Proof of Mind Layer</h1>
   <p>Replacing CAPTCHAs with engaging micro-challenges that verify humanness and train AI</p>
   
-  [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
   [![Bolt.new Hackathon](https://img.shields.io/badge/Built%20for-Bolt.new%20Hackathon-7D3AFF)](https://bolt.new)
-  [![Twitter](https://img.shields.io/twitter/follow/yunoverify?style=social)](https://twitter.com/yunoverify)
 
   [![Live Demo](https://img.shields.io/badge/🚀-Live%20Demo-7D3AFF?style=for-the-badge)](https://yuno-bolt.netlify.app/)
   
-  [![Documentation](https://img.shields.io/badge/📚-Documentation-2B7CD3?style=for-the-badge)](https://github.com/yourusername/yuno-docs)
+  [![Documentation](https://img.shields.io/badge/📚-Documentation-2B7CD3?style=for-the-badge)](https://github.com/sifeddinemeb/yuno-docs)
 </div>
 
 ## 🚀 What is Yuno?
@@ -104,7 +101,7 @@ Yuno is **the internet's first Proof of Mind layer** — a next-generation human
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/yuno.git
+git clone https://github.com/sifeddinemeb/yuno.git
 cd yuno
 
 # Install dependencies
@@ -119,11 +116,7 @@ npm run dev
 
 ## 📚 Documentation
 
-- [API Reference](https://github.com/yourusername/yuno-docs/blob/main/API.md)
-- [Integration Guide](https://github.com/yourusername/yuno-docs/blob/main/INTEGRATION.md)
-- [Challenge Types](https://github.com/yourusername/yuno-docs/blob/main/CHALLENGES.md)
-- [Analytics Dashboard](https://github.com/yourusername/yuno-docs/blob/main/ANALYTICS.md)
-- [Deployment Guide](https://github.com/yourusername/yuno-docs/blob/main/DEPLOYMENT.md)
+- [PROJECT DOCS](https://github.com/sifeddinemeb/yuno-docs)
 
 ## 🤝 Contributing
 
@@ -143,7 +136,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Twitter: [@yunoverify](https://twitter.com/yunoverify)
 - Email: hello@yuno.tech
-- GitHub: [yuno-project](https://github.com/yourusername/yuno)
+- GitHub: [yuno-project](https://github.com/sifeddinemeb/yuno)
 
 ---
 
