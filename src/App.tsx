@@ -124,10 +124,10 @@ function App() {
                 {/* Admin Routes */}
                 <Route path="/admin/*" element={
                   adminUser ? (
-                    <div className="flex">
+                    <div className="flex h-screen overflow-hidden">
                       <Navigation />
-                      <div className="flex-1 ml-0 md:ml-64 min-w-0">
-                        <div className="p-8 overflow-x-auto">
+                      <div className="flex-1 ml-0 md:ml-64 min-w-0 flex flex-col">
+                        <div className="p-8 overflow-y-auto flex-1">
                           <ErrorBoundary fallbackRender={errorFallback}>
                             <Routes>
                               <Route path="/" element={<Dashboard />} />
