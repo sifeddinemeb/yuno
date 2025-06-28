@@ -13,7 +13,8 @@ import {
   FileText,
   Eye,
   Lightbulb,
-  Sparkles
+  Sparkles,
+  Users
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
@@ -386,13 +387,13 @@ const Demo = () => {
             <Card variant="glass" className="text-left mb-8">
               <div className="bg-dark-200 rounded-lg p-4 font-mono text-sm overflow-x-auto">
                 <div className="text-gray-400 mb-2">// HTML Integration</div>
-                <div className="text-neon-blue">&lt;script</div>
+                <div className="text-neon-blue"><script</div>
                 <div className="text-white ml-4">src="https://cdn.yuno.ai/widget.js"</div>
-                <div className="text-neon-blue">&gt;&lt;/script&gt;</div>
-                <div className="text-neon-blue mt-2">&lt;div</div>
+                <div className="text-neon-blue">></script></div>
+                <div className="text-neon-blue mt-2"><div</div>
                 <div className="text-white ml-4">id="yuno-widget"</div>
                 <div className="text-white ml-4">data-api-key="your_api_key"</div>
-                <div className="text-neon-blue">&gt;&lt;/div&gt;</div>
+                <div className="text-neon-blue">></div></div>
               </div>
             </Card>
 
