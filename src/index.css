@@ -389,6 +389,16 @@
   .light .border-secondary {
     @apply border-gray-200;
   }
+
+  /* Triangle shape for demo page */
+  .triangle {
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 36px solid currentColor;
+    background-color: transparent !important;
+  }
 }
 
 /* AI Generator specific styles */
