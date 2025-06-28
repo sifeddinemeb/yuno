@@ -13,9 +13,9 @@ const buttonVariants = cva(
         danger: 'bg-neon-red text-white hover:bg-red-600 hover:shadow-lg hover:shadow-neon-red/25 disabled:bg-red-300 dark:disabled:bg-red-900 disabled:hover:shadow-none',
       },
       size: {
-        sm: 'h-9 px-4 text-sm',
-        md: 'h-11 px-7 text-base',
-        lg: 'h-13 px-10 text-lg',
+        sm: 'h-10 px-5 text-sm',
+        md: 'h-12 px-8 text-base',
+        lg: 'h-14 px-12 text-lg',
       },
     },
     defaultVariants: {
