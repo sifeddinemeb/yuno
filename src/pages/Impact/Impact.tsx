@@ -2,15 +2,14 @@ import { motion } from 'framer-motion';
 import { 
   Brain, 
   Shield, 
-  Heart, 
+  AlertCircle,
   TrendingUp, 
   Users, 
   Zap, 
   CheckCircle, 
   ArrowRight,
   BarChart3,
-  Lock,
-  Sparkles
+  DollarSign
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
@@ -18,49 +17,11 @@ import Card from '../../components/ui/Card/Card';
 import PublicNavbar from '../../components/layout/PublicNavbar/PublicNavbar';
 
 const Impact = () => {
-  const impactStats = [
-    { label: 'AI Models Improved', value: '2,847', icon: Brain, color: 'text-neon-blue' },
-    { label: 'Bots Detected', value: '1.2M+', icon: Shield, color: 'text-neon-red' },
-    { label: 'User Satisfaction', value: '94%', icon: Heart, color: 'text-neon-green' },
-    { label: 'Data Points Collected', value: '15.7M', icon: BarChart3, color: 'text-neon-purple' },
-  ];
-
-  const benefits = [
-    {
-      icon: Brain,
-      title: 'Solving the AI Data Drought',
-      description: 'Every interaction generates high-quality, human-labeled reasoning data that fuels smarter, safer AI models.',
-      stats: ['10x higher quality than traditional datasets', '99.7% accuracy in human reasoning patterns', 'Real-time ethical decision mapping'],
-      color: 'from-neon-blue to-blue-600'
-    },
-    {
-      icon: Shield,
-      title: 'Redefining Internet Security',
-      description: 'Advanced cognitive challenges that evolve faster than bot capabilities, providing superior protection.',
-      stats: ['99.7% bot detection accuracy', '67% reduction in false positives', 'Adaptive challenge difficulty'],
-      color: 'from-neon-red to-red-600'
-    },
-    {
-      icon: Heart,
-      title: 'Enhancing User Experience',
-      description: 'Transform frustrating CAPTCHAs into engaging micro-challenges that users actually enjoy.',
-      stats: ['94% user satisfaction rate', '8.3s average completion time', '45% increase in conversion rates'],
-      color: 'from-neon-green to-emerald-600'
-    },
-    {
-      icon: Lock,
-      title: 'Ethical Data Sourcing',
-      description: 'Transparent, consensual data collection that respects user privacy while advancing AI capabilities.',
-      stats: ['100% transparent data usage', 'GDPR & CCPA compliant', 'User-controlled data sharing'],
-      color: 'from-neon-purple to-violet-600'
-    }
-  ];
-
   return (
-    <div>
+    <div className="bg-dark-100">
       <PublicNavbar />
 
-      {/* Hero Section */}
+      {/* Hero Section - The CAPTCHA Crisis */}
       <section className="relative overflow-hidden pt-32 pb-20 px-4">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -70,109 +31,270 @@ const Impact = () => {
             className="text-center"
           >
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Transforming the{' '}
-              <span className="bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
-                Digital Landscape
-              </span>
+              The <span className="text-white">CAPTCHA</span>
+              <br />
+              <span className="text-neon-red">Crisis</span>
             </h1>
             
             <p className="text-xl text-muted max-w-3xl mx-auto mb-12">
-              Yuno isn't just replacing CAPTCHAs—we're building the foundation for a more intelligent, 
-              secure, and human-centered internet. Every interaction creates positive impact.
+              Every day, humanity wastes <span className="text-neon-red font-semibold">500 years</span> solving meaningless puzzles that modern AI 
+              can beat faster than humans. Meanwhile, AI development starves for quality data.
             </p>
 
-            {/* Impact Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-              {impactStats.map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                >
-                  <Card variant="glass" className="text-center">
-                    <stat.icon className={`w-8 h-8 ${stat.color} mx-auto mb-3`} />
-                    <div className="text-2xl font-bold text-primary mb-1">{stat.value}</div>
-                    <div className="text-sm text-muted">{stat.label}</div>
-                  </Card>
-                </motion.div>
-              ))}
+            {/* Crisis Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+              <Card variant="glass" className="text-center">
+                <h2 className="text-4xl font-extrabold text-neon-blue mb-2">40%</h2>
+                <p className="font-semibold mb-1">Conversion Loss</p>
+                <p className="text-xs text-muted">Due to CAPTCHA friction and abandonment</p>
+              </Card>
+
+              <Card variant="glass" className="text-center">
+                <h2 className="text-4xl font-extrabold text-neon-purple mb-2">99%</h2>
+                <p className="font-semibold mb-1">AI Success Rate</p>
+                <p className="text-xs text-muted">Modern AI solves CAPTCHAs better than humans</p>
+              </Card>
+
+              <Card variant="glass" className="text-center">
+                <h2 className="text-4xl font-extrabold text-neon-green mb-2">$30</h2>
+                <p className="font-semibold mb-1">Lost Per $1 Fraud</p>
+                <p className="text-xs text-muted">By blocking legitimate users with bad UX</p>
+              </Card>
             </div>
           </motion.div>
         </div>
-        
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-neon-blue/10 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-neon-purple/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-        </div>
       </section>
 
-      {/* Benefits Sections */}
+      {/* The RealCaptcha Revolution */}
       <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto space-y-32">
-          {benefits.map((benefit, index) => (
-            <motion.div
-              key={benefit.title}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              viewport={{ once: true }}
-              className={`grid lg:grid-cols-2 gap-12 items-center ${
-                index % 2 === 1 ? 'lg:grid-flow-col-dense' : ''
-              }`}
-            >
-              <div className={index % 2 === 1 ? 'lg:col-start-2' : ''}>
-                <div className={`w-16 h-16 bg-gradient-to-r ${benefit.color} rounded-xl flex items-center justify-center mb-6`}>
-                  <benefit.icon className="w-8 h-8 text-white" />
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-5xl font-bold text-primary mb-6">
+              The <span className="text-white">RealCaptcha</span>
+              <br />
+              <span className="text-neon-blue">Revolution</span>
+            </h2>
+            <p className="text-xl text-muted max-w-3xl mx-auto">
+              We're not just fixing CAPTCHA—we're creating the world's largest source of human reasoning data
+              while making the internet more secure and accessible.
+            </p>
+          </motion.div>
+
+          {/* Problem vs Solution */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <Card variant="glass" className="text-left">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-neon-red/20 rounded-full flex items-center justify-center mr-4">
+                  <AlertCircle className="w-6 h-6 text-neon-red" />
                 </div>
-                
-                <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
-                  {benefit.title}
-                </h2>
-                
-                <p className="text-xl text-muted mb-8">
-                  {benefit.description}
-                </p>
-                
-                <div className="space-y-3">
-                  {benefit.stats.map((stat, statIndex) => (
-                    <div key={statIndex} className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-neon-green mr-3 flex-shrink-0" />
-                      <span className="text-secondary">{stat}</span>
-                    </div>
-                  ))}
+                <h3 className="text-2xl font-semibold">The Problem</h3>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <span className="text-neon-red mr-2">•</span>
+                  <span>Traditional CAPTCHAs are easily defeated by modern AI</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-red mr-2">•</span>
+                  <span>Users spend 25 seconds on average per challenge</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-red mr-2">•</span>
+                  <span>Accessibility barriers exclude millions of users</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-red mr-2">•</span>
+                  <span>Generated data serves no useful purpose</span>
+                </li>
+              </ul>
+            </Card>
+
+            <Card variant="glass" className="text-left">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-neon-blue/20 rounded-full flex items-center justify-center mr-4">
+                  <Zap className="w-6 h-6 text-neon-blue" />
                 </div>
+                <h3 className="text-2xl font-semibold">Our Solution</h3>
               </div>
-              
-              <div className={index % 2 === 1 ? 'lg:col-start-1' : ''}>
-                <Card variant="glow" className="p-8">
-                  <div className="text-center">
-                    <div className={`w-24 h-24 bg-gradient-to-r ${benefit.color} rounded-full flex items-center justify-center mx-auto mb-6`}>
-                      <benefit.icon className="w-12 h-12 text-white" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-primary mb-4">
-                      Real-World Impact
-                    </h3>
-                    <div className="space-y-4">
-                      {benefit.stats.map((stat, statIndex) => (
-                        <div key={statIndex} className="flex justify-between items-center">
-                          <span className="text-muted text-sm">{stat.split(' ')[0]}</span>
-                          <span className="font-semibold text-neon-blue">
-                            {stat.split(' ').slice(1).join(' ')}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </motion.div>
-          ))}
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <span className="text-neon-blue mr-2">•</span>
+                  <span>AI-resistant cognitive challenges that evolve</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-blue mr-2">•</span>
+                  <span>5-10 second completion times</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-blue mr-2">•</span>
+                  <span>Fully accessible to all users</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-blue mr-2">•</span>
+                  <span>Every interaction generates valuable AI training data</span>
+                </li>
+              </ul>
+            </Card>
+          </div>
+
+          <div className="flex justify-center">
+            <Link to="/demo">
+              <Button size="lg" className="px-8">
+                Experience The Future <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Future Vision */}
+      {/* Triple Win Value Loop */}
+      <section className="py-20 px-4 bg-gradient-to-r from-neon-blue/5 to-neon-purple/5">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-5xl font-bold mb-2">
+              Triple Win
+            </h2>
+            <h3 className="text-3xl md:text-4xl font-bold text-neon-purple mb-6">
+              Value Loop
+            </h3>
+            <p className="text-xl text-muted max-w-3xl mx-auto">
+              Every interaction creates value for users, websites, and the entire AI ecosystem
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card variant="glass" className="text-center">
+              <div className="flex items-center justify-center mb-6">
+                <div className="w-16 h-16 bg-neon-blue/20 rounded-full flex items-center justify-center">
+                  <Users className="w-8 h-8 text-neon-blue" />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Users Win</h3>
+              <p className="text-muted mb-6">
+                Fast, intuitive challenges that feel like mini-games instead of tests. Your intelligence contributes to 
+                advancing AI without any privacy concerns.
+              </p>
+              <div className="text-sm text-neon-blue">
+                5x faster than traditional CAPTCHAs
+              </div>
+            </Card>
+
+            <Card variant="glass" className="text-center">
+              <div className="flex items-center justify-center mb-6">
+                <div className="w-16 h-16 bg-neon-green/20 rounded-full flex items-center justify-center">
+                  <TrendingUp className="w-8 h-8 text-neon-green" />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Websites Win</h3>
+              <p className="text-muted mb-6">
+                Higher conversion rates, better security against modern bots, and access to valuable user behavior insights.
+              </p>
+              <div className="text-sm text-neon-green">
+                Up to 40% conversion improvement
+              </div>
+            </Card>
+
+            <Card variant="glass" className="text-center">
+              <div className="flex items-center justify-center mb-6">
+                <div className="w-16 h-16 bg-neon-purple/20 rounded-full flex items-center justify-center">
+                  <Brain className="w-8 h-8 text-neon-purple" />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold mb-4">AI Ecosystem Wins</h3>
+              <p className="text-muted mb-6">
+                Access unprecedented human reasoning data for training safer, more capable AI systems across culture, ethics, and logic.
+              </p>
+              <div className="text-sm text-neon-purple">
+                Ethical, structured training data
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Market Disruption */}
+      <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-5xl font-bold mb-2">
+              Market
+            </h2>
+            <h3 className="text-3xl md:text-4xl font-bold text-neon-orange mb-6">
+              Disruption
+            </h3>
+            <p className="text-xl text-muted max-w-3xl mx-auto">
+              We're not competing with Google head-on. We're exploiting structural weaknesses in their model 
+              through classic disruption theory.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            <Card variant="glass" className="text-left">
+              <h3 className="text-xl font-semibold text-neon-red mb-4">Google's Structural Problem</h3>
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <span className="text-neon-red mr-2">•</span>
+                  <span>Uses reCAPTCHA data for internal projects only</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-red mr-2">•</span>
+                  <span>Cannot sell data to AI competitors (no upside)</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-red mr-2">•</span>
+                  <span>Poor user experience due to extractive model</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-red mr-2">•</span>
+                  <span>Market too small for their massive scale needs</span>
+                </li>
+              </ul>
+            </Card>
+
+            <Card variant="glass" className="text-left">
+              <h3 className="text-xl font-semibold text-neon-green mb-4">Our Asymmetric Advantage</h3>
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <span className="text-neon-green mr-2">•</span>
+                  <span>Neutral data provider to entire AI ecosystem</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-green mr-2">•</span>
+                  <span>Multi-billion dollar data market opportunity</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-green mr-2">•</span>
+                  <span>Superior user experience drives adoption</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-neon-green mr-2">•</span>
+                  <span>Strategic speed and focus advantage</span>
+                </li>
+              </ul>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Vision */}
       <section className="py-20 px-4 bg-gradient-to-r from-neon-blue/10 to-neon-purple/10">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
@@ -181,61 +303,28 @@ const Impact = () => {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <Sparkles className="w-16 h-16 text-neon-purple mx-auto mb-6" />
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
-              The Future of Human Intelligence
-            </h2>
-            <p className="text-xl text-muted mb-8">
-              Yuno is building toward a decentralized, crowdsourced human intelligence layer that will 
-              power the next generation of AI systems. Every challenge completed today contributes to 
-              a more intelligent, ethical, and human-centered digital future.
-            </p>
-            <div className="grid md:grid-cols-3 gap-6">
-              <Card variant="glass" className="text-center">
-                <Users className="w-8 h-8 text-neon-blue mx-auto mb-3" />
-                <h3 className="font-semibold text-primary mb-2">Collective Intelligence</h3>
-                <p className="text-sm text-muted">Harness the wisdom of crowds for AI training</p>
-              </Card>
-              <Card variant="glass" className="text-center">
-                <TrendingUp className="w-8 h-8 text-neon-green mx-auto mb-3" />
-                <h3 className="font-semibold text-primary mb-2">Continuous Learning</h3>
-                <p className="text-sm text-muted">AI models that evolve with human feedback</p>
-              </Card>
-              <Card variant="glass" className="text-center">
-                <Zap className="w-8 h-8 text-neon-purple mx-auto mb-3" />
-                <h3 className="font-semibold text-primary mb-2">Instant Adaptation</h3>
-                <p className="text-sm text-muted">Real-time response to emerging threats</p>
-              </Card>
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-12 h-12 bg-dark-200 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-neon-blue" />
+              </div>
             </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
-              Ready to Make an Impact?
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Our Vision
             </h2>
             <p className="text-xl text-muted mb-8">
-              Join thousands of organizations already using Yuno to create a better internet. 
-              Every verification makes a difference.
+              A world where every human interaction with technology is meaningful, enjoyable, and contributes to the advancement of artificial 
+              intelligence. Where security doesn't come at the cost of user experience, and where billions of hours of human time fuel AI 
+              development instead of being wasted on meaningless tasks.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/demo">
                 <Button size="lg" className="px-8">
-                  Try Live Demo <ArrowRight className="ml-2 w-5 h-5" />
+                  Experience The Future
                 </Button>
               </Link>
               <Link to="/auth/login">
                 <Button variant="secondary" size="lg" className="px-8">
-                  Get Started
+                  Join The Revolution
                 </Button>
               </Link>
             </div>
