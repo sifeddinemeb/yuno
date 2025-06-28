@@ -15,11 +15,13 @@ import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import Card from '../../components/ui/Card/Card';
 import PublicNavbar from '../../components/layout/PublicNavbar/PublicNavbar';
+import BackgroundBlobs from '../../components/layout/BackgroundBlobs/BackgroundBlobs';
 
 const Impact = () => {
   return (
-    <div className="bg-dark-100">
+    <div className="min-h-screen">
       <PublicNavbar />
+      <BackgroundBlobs />
 
       {/* Hero Section - The CAPTCHA Crisis */}
       <section className="relative overflow-hidden pt-32 pb-20 px-4">

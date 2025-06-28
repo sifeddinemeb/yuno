@@ -88,18 +88,18 @@
     background: rgba(255,255,255,0.05);
   }
   .dark .glass-real {
-    background: rgba(255,255,255,0.07);
-    @apply border-white/15 shadow-black/40 shadow-lg;
+    background: rgba(255,255,255,0.03);
+    @apply border-white/10 shadow-black/40 shadow-lg;
   }
   .light .glass-real {
-    @apply border-gray-200 bg-white/50 shadow-gray-900/10 shadow-lg;
+    @apply border-gray-200 bg-white/30 shadow-gray-900/10 shadow-lg;
   }
   .glass-real::before {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.05) 100%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 100%);
     mix-blend-mode: overlay;
     pointer-events: none;
   }

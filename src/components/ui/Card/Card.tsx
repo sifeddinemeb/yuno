@@ -11,8 +11,8 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={clsx('rounded-xl transition-all duration-300', {
-          'card p-8': variant === 'default',
-          'glass-real p-8 hover:bg-white/10 dark:hover:bg-white/20': variant === 'glass',
+          'card': variant === 'default',
+          'glass-real bg-white/5 dark:bg-white/5 backdrop-blur-lg border-white/10 p-8': variant === 'glass',
           'glass-lite p-8': variant === 'glass-lite',
           'card neon-glow p-8': variant === 'glow',
         }, className)}
