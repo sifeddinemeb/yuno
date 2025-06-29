@@ -34,8 +34,7 @@ const Vision = () => {
             </h2>
             
             <p className="text-lg md:text-xl text-muted max-w-3xl mx-auto mb-8">
-              Frustrating CAPTCHAs waste <span className="font-semibold">500 years</span> of human time every single day. Yuno replaces those aggravating puzzles with 
-delightful micro-challenges that delight users while training tomorrow's AI.
+              Frustrating CAPTCHAs waste <span className="font-semibold">Yuno transforms the most hated part of the internet into a seamless experience that generates high-quality data for the AI ecosystem.
             </p>
             
             <div className="max-w-3xl mx-auto mb-12">
