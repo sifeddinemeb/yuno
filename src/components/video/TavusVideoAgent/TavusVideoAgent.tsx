@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Video, Phone, PhoneOff, Mic, MicOff, Shield, RefreshCw, AlertCircle } from 'lucide-react';
+import { Video, Phone, PhoneOff, Mic, MicOff, Shield, RefreshCw, AlertCircle, Clock } from 'lucide-react';
 import Button from '../../ui/Button/Button';
 import Card from '../../ui/Card/Card';
 
@@ -16,7 +16,8 @@ type ConversationState =
   | 'error'      // Error occurred
   | 'connected'  // Video chat in progress
   | 'completed'  // Video chat completed successfully
-  | 'failed';    // Video chat failed
+  | 'failed'     // Video chat failed
+  | 'rate_limited'; // Hit concurrent conversation limit
 
 const TavusVideoAgent: React.FC<TavusVideoAgentProps> = ({ 
   agentName = 'Yuno', 
@@ -26,6 +27,8 @@ const TavusVideoAgent: React.FC<TavusVideoAgentProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [conversationUrl, setConversationUrl] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const [isRetrying, setIsRetrying] = useState(false);
   const videoRef = useRef<HTMLIFrameElement | null>(null);
   const apiKeyRef = useRef<string>(import.meta.env.VITE_TAVUS_API_KEY || '');
 
@@ -106,7 +109,17 @@ Your task is to ask the user one open-ended, common-sense question and evaluate 
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create conversation');
+        const errorMessage = errorData.message || 'Failed to create conversation';
+        
+        // Check for specific concurrent conversation limit error
+        if (errorMessage.toLowerCase().includes('maximum concurrent conversations') || 
+            errorMessage.toLowerCase().includes('concurrent limit') ||
+            errorMessage.toLowerCase().includes('too many active conversations')) {
+          setConversationState('rate_limited');
+          return;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -115,11 +128,23 @@ Your task is to ask the user one open-ended, common-sense question and evaluate 
         setConversationId(data.conversation_id);
         setConversationUrl(data.conversation_url);
         setConversationState('connected');
+        setRetryCount(0); // Reset retry count on success
       } else {
         throw new Error('Invalid response format from Tavus API');
       }
     } catch (err: any) {
       console.error('Error initiating video chat:', err);
+      
+      // Check for concurrent conversation limit in caught errors
+      if (err.message && (
+        err.message.toLowerCase().includes('maximum concurrent conversations') ||
+        err.message.toLowerCase().includes('concurrent limit') ||
+        err.message.toLowerCase().includes('too many active conversations')
+      )) {
+        setConversationState('rate_limited');
+        return;
+      }
+      
       setError(err.message || 'Failed to connect to video chat service');
       setConversationState('error');
     }
@@ -127,7 +152,24 @@ Your task is to ask the user one open-ended, common-sense question and evaluate 
 
   const handleRetry = () => {
     setError(null);
+    setRetryCount(0);
+    setIsRetrying(false);
     setConversationState('idle');
+  };
+
+  const handleRetryWithDelay = async () => {
+    setIsRetrying(true);
+    setRetryCount(prev => prev + 1);
+    
+    // Wait 10 seconds before retrying to give active conversations time to end
+    setTimeout(() => {
+      setIsRetrying(false);
+      setConversationState('calling');
+      setTimeout(() => {
+        setConversationState('connecting');
+        initiateVideoChat();
+      }, 2000);
+    }, 10000);
   };
 
   // Clean up when unmounting
@@ -252,6 +294,58 @@ Your task is to ask the user one open-ended, common-sense question and evaluate 
                     Cancel
                   </Button>
                 </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+
+        {conversationState === 'rate_limited' && (
+          <motion.div
+            key="rate-limited-state"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center"
+          >
+            <Card variant="glass" className="p-6">
+              <div className="py-8">
+                <div className="w-16 h-16 bg-neon-orange/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Clock className="w-8 h-8 text-neon-orange" />
+                </div>
+                
+                <h3 className="text-xl font-bold text-neon-orange mb-4">Service Temporarily Busy</h3>
+                <p className="text-muted mb-6">
+                  All video agents are currently in use. This typically resolves within a few minutes as conversations end.
+                </p>
+                
+                {isRetrying ? (
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="w-8 h-8 mx-auto">
+                      <RefreshCw className="w-8 h-8 text-neon-blue animate-spin" />
+                    </div>
+                    <p className="text-sm text-muted">
+                      Retrying in a few seconds... (Attempt {retryCount + 1})
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex justify-center gap-4">
+                    <Button
+                      onClick={handleRetryWithDelay}
+                      className="px-6"
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Retry in 10s
+                    </Button>
+                    
+                    <Button
+                      onClick={handleRetry}
+                      variant="secondary"
+                      className="px-6"
+                    >
+                      Back to Start
+                    </Button>
+                  </div>
+                )}
               </div>
             </Card>
           </motion.div>
