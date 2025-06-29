@@ -89,10 +89,18 @@ const AIContentGenerator = ({ onContentGenerated, onClose }: AIContentGeneratorP
       setError(null);
       setSuccess(null);
 
+      // Make sure generator is initialized
+      if (apiStatus === 'unknown') {
+        await geminiGenerator.initialize();
+      }
+
+      console.log('Starting content generation with settings:', generationSettings);
+      
       let content;
       
       try {
         content = await geminiGenerator.generateContent(generationSettings);
+        console.log(`Generated ${content.length} content items`);
       } catch (err: any) {
         console.error('API call error:', err);
         throw new Error(`Failed to generate content: ${err.message}`);
