@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Video, Phone, PhoneOff, Mic, MicOff, Shield, RefreshCw, AlertCircle, Clock } from 'lucide-react';
+import { Video, Phone, PhoneOff, Mic, MicOff, Shield, RefreshCw, AlertCircle, Clock, Info } from 'lucide-react';
 import Button from '../../ui/Button/Button';
 import Card from '../../ui/Card/Card';
 
 interface TavusVideoAgentProps {
   agentName?: string;
   onConversationEnd?: (success: boolean) => void;
+  mode?: 'info' | 'verification';
 }
 
 type ConversationState = 
@@ -21,7 +22,8 @@ type ConversationState =
 
 const TavusVideoAgent: React.FC<TavusVideoAgentProps> = ({ 
   agentName = 'Yuno', 
-  onConversationEnd 
+  onConversationEnd,
+  mode = 'info'
 }) => {
   const [conversationState, setConversationState] = useState<ConversationState>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -57,16 +59,114 @@ const TavusVideoAgent: React.FC<TavusVideoAgentProps> = ({
         throw new Error('Missing Tavus API key');
       }
 
-      const response = await fetch('https://tavusapi.com/v2/conversations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey
-        },
-        body: JSON.stringify({
-          replica_id: "r9d30b0e55ac",
-          persona_id: "p5143f550a0e",
-          conversational_context: `# Core Identity & Purpose
+      // Configure the proper replica and persona IDs based on the mode
+      const config = mode === 'info' 
+        ? {
+            replica_id: "rca8a38779a8",
+            persona_id: "pfc95ea154a6",
+            conversational_context: `# 🧠 Yuno – Product Vision
+
+**Version:** 1.0  
+**Date:** June 21, 2025  
+**Prepared by:** Yuno Core Team
+
+---
+
+## 🎯 What is Yuno?
+
+Yuno is **the internet's first Proof of Mind layer** — a next-gen human verification system that replaces frustrating CAPTCHAs with micro-challenges designed to verify humanness, delight users, and generate high-quality data for training ethical, intelligent AI.
+
+Yuno turns every bot check into a moment of meaning — a fast, fun, cognitively engaging interaction that transforms digital friction into fuel for the future of artificial intelligence.
+
+---
+
+## 🌍 Why Yuno Exists
+
+Modern CAPTCHAs are broken:  
+- They annoy humans.  
+- They barely stop bots.  
+- They waste billions of daily interactions.
+
+At the same time, AI is starving for high-quality, human-labeled data — especially around **reasoning**, **emotion**, **ethics**, and **cultural nuance**.
+
+Yuno solves both problems.
+
+It introduces a new internet primitive: **Proof of Mind** — where proving you're human means producing micro-evidence of real thinking.
+
+---
+
+## 🧩 What Makes Yuno Unique
+
+### ✅ Challenge-as-Verification:
+Instead of traffic lights or distorted text, users engage in 5–10 second mini-games that test real human abilities:
+- Sarcasm detection  
+- Cultural decoding  
+- Visual illusions  
+- Moral reasoning  
+- Creative prompts
+
+Each one verifies the user **and** contributes to AI training.
+
+---
+
+### 📡 A Dual Data Stream:
+
+Every interaction generates structured signal data:
+- **Human Stream** → Fuels the next generation of LLMs and multimodal AI.
+- **Bot Stream** → Feeds detection models to adapt and evolve challenges in real time.
+
+---
+
+### 🤖 Humanizing AI at Internet Scale
+
+Each Yuno challenge produces one high-value data point grounded in *human cognition*.  
+Multiplied across the web, this becomes a continuous, crowdsourced stream of:
+- Emotional tone labeling  
+- Social intelligence  
+- Creative interpretation  
+- Contextual logic  
+- Voice/avatar data (via Tavus)
+
+---
+
+## 🚀 What We're Building
+
+Yuno is both a **widget** and a **platform**:
+
+- **Frontend Widget:** Lightweight, embeddable JS & React component.
+- **Challenge Engine:** Runs on Bolt.new (React + Tailwind + shadcn/ui).
+- **Database & Logic:** Supabase with secure row-level access.
+- **Voice/Avatar Challenge:** Integrated with Tavus for real-time video prompts.
+- **AI Content Generation:** Powered by OpenAI APIs to keep challenges novel and relevant.
+
+---
+
+## 💡 Long-Term Vision
+
+Yuno becomes the **invisible thinking layer** of the internet — quietly verifying humanity, training AI, and understanding bot evolution through playful, intentional micro-interactions.
+
+### We envision:
+- A world where **users enjoy CAPTCHAs**  
+- A new class of **data-driven AI training games**  
+- A **decentralized proof-of-mind layer** integrated across the web  
+- A **safer, more human internet** powered by trust, not annoyance
+
+---
+
+## 🏁 Our Promise
+
+**To developers:** Integration is easy. Performance is fast. Data is structured and useful.  
+**To users:** It's not just a checkpoint — it's a microgame that matters.  
+**To the future:** Every challenge you complete helps teach the next generation of AI how to reason, empathize, and align with human values.
+
+---
+
+> **Yuno isn't just security. It's a cognitive handshake between humans and machines.**`
+          }
+        : {
+            replica_id: "r9d30b0e55ac",
+            persona_id: "p5143f550a0e",
+            conversational_context: `# Core Identity & Purpose
 You are Yuno, a friendly and intelligent AI guide. Your primary function is to conduct a quick, engaging cognitive check to verify that the user is human. Your goal is to make this security check feel less like a test and more like a brief, interesting conversation.
 
 # Personality & Tone
@@ -104,7 +204,15 @@ Your task is to ask the user one open-ended, common-sense question and evaluate 
 - DO NOT get sidetracked. Your only goal is to ask the question and evaluate the response.
 - The entire interaction must be completed in under 20 seconds.
 - You have only ONE turn. After the user responds, you MUST deliver a success or failure message and end the conversation.`
-        }),
+          };
+
+      const response = await fetch('https://tavusapi.com/v2/conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+        },
+        body: JSON.stringify(config),
       });
 
       if (!response.ok) {
@@ -172,15 +280,53 @@ Your task is to ask the user one open-ended, common-sense question and evaluate 
     }, 10000);
   };
 
-  // Clean up when unmounting
+  // Handle message events from the iframe
   useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // Make sure the message is from Tavus
+      if (event.origin !== 'https://conversation.tavus.com') return;
+      
+      try {
+        // Parse the message data
+        const data = typeof event.data === 'string' 
+          ? JSON.parse(event.data) 
+          : event.data;
+        
+        // Check for conversation end event
+        if (data.type === 'conversation-end' || data.type === 'conversation_end') {
+          console.log('Conversation ended:', data);
+          setConversationState('completed');
+          onConversationEnd?.(true);
+        }
+      } catch (err) {
+        console.error('Error processing message from Tavus:', err);
+      }
+    };
+
+    // Add event listener for messages from the iframe
+    window.addEventListener('message', handleMessage);
+
+    // Cleanup when unmounting
     return () => {
+      window.removeEventListener('message', handleMessage);
+      
       if (conversationId) {
-        // If needed: Cancel any active conversations when component unmounts
         console.log('Cleaning up conversation:', conversationId);
       }
     };
-  }, [conversationId]);
+  }, [conversationId, onConversationEnd]);
+
+  const buttonLabel = mode === 'info' 
+    ? 'Learn About Yuno' 
+    : 'Start Verification';
+  
+  const headerTitle = mode === 'info'
+    ? `Meet ${agentName}, Your AI Guide`
+    : `Video Verification with ${agentName}`;
+  
+  const headerDescription = mode === 'info'
+    ? 'Start a video chat to learn more about Yuno and how it transforms internet verification.'
+    : 'Complete a quick video verification to prove you\'re human.';
 
   return (
     <div className="w-full max-w-3xl mx-auto">
@@ -198,12 +344,16 @@ Your task is to ask the user one open-ended, common-sense question and evaluate 
               
               <div className="relative z-10 py-8">
                 <div className="w-16 h-16 bg-gradient-to-r from-neon-blue to-neon-purple rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Video className="w-8 h-8 text-white" />
+                  {mode === 'info' ? (
+                    <Info className="w-8 h-8 text-white" />
+                  ) : (
+                    <Video className="w-8 h-8 text-white" />
+                  )}
                 </div>
                 
-                <h3 className="text-2xl font-bold mb-3">Meet {agentName}, Your AI Guide</h3>
+                <h3 className="text-2xl font-bold mb-3">{headerTitle}</h3>
                 <p className="text-muted mb-8 max-w-md mx-auto">
-                  Start a video chat to learn more about Yuno and experience our human verification technology in action.
+                  {headerDescription}
                 </p>
                 
                 <Button 
@@ -212,7 +362,7 @@ Your task is to ask the user one open-ended, common-sense question and evaluate 
                   className="px-8 mx-auto"
                 >
                   <Video className="w-4 h-4 mr-2" />
-                  Start Video Chat
+                  {buttonLabel}
                 </Button>
                 
                 <div className="text-xs text-muted mt-4">
@@ -441,14 +591,17 @@ Your task is to ask the user one open-ended, common-sense question and evaluate 
                   <Shield className="w-8 h-8 text-neon-green" />
                 </div>
                 
-                <h3 className="text-xl font-bold text-neon-green mb-4">Verification Complete</h3>
+                <h3 className="text-xl font-bold text-neon-green mb-4">Conversation Complete</h3>
                 <p className="text-muted mb-6">
-                  You've successfully completed the video verification process.
+                  {mode === 'info' 
+                    ? "Thanks for learning about Yuno. You can now explore more features below."
+                    : "You've successfully completed the video verification process."}
                 </p>
                 
                 <div className="flex justify-center">
                   <Button
                     onClick={handleRetry}
+                    variant="secondary"
                     className="px-6"
                   >
                     Start New Conversation
@@ -473,9 +626,9 @@ Your task is to ask the user one open-ended, common-sense question and evaluate 
                   <Shield className="w-8 h-8 text-neon-orange" />
                 </div>
                 
-                <h3 className="text-xl font-bold text-neon-orange mb-4">Verification Needed</h3>
+                <h3 className="text-xl font-bold text-neon-orange mb-4">Conversation Ended</h3>
                 <p className="text-muted mb-6">
-                  We couldn't verify your identity through the video chat. Please try a different verification method.
+                  The conversation was ended unexpectedly. Would you like to try again?
                 </p>
                 
                 <div className="flex justify-center">
