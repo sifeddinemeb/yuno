@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase } from '../supabase';
 
 /**
  * Helper library for interacting with Supabase Edge Functions
