@@ -1,14 +1,14 @@
 # 🧠 Yuno – Product Vision
 
-**Version:** 1.0  
-**Date:** June 21, 2025  
+**Version:** 1.1  
+**Date:** June 25, 2025  
 **Prepared by:** Yuno Core Team
 
 ---
 
 ## 🎯 What is Yuno?
 
-Yuno is **the internet’s first Proof of Mind layer** — a next-gen human verification system that replaces frustrating CAPTCHAs with micro-challenges designed to verify humanness, delight users, and generate high-quality data for training ethical, intelligent AI.
+Yuno is **the internet's first Proof of Mind layer** — a next-gen human verification system that replaces frustrating CAPTCHAs with micro-challenges designed to verify humanness, delight users, and generate high-quality data for training ethical, intelligent AI.
 
 Yuno turns every bot check into a moment of meaning — a fast, fun, cognitively engaging interaction that transforms digital friction into fuel for the future of artificial intelligence.
 
@@ -38,6 +38,7 @@ Instead of traffic lights or distorted text, users engage in 5–10 second mini-
 - Visual illusions  
 - Moral reasoning  
 - Creative prompts
+- Video verification
 
 Each one verifies the user **and** contributes to AI training.
 
@@ -63,15 +64,31 @@ Multiplied across the web, this becomes a continuous, crowdsourced stream of:
 
 ---
 
-## 🚀 What We’re Building
+## 🚀 What We've Built
 
 Yuno is both a **widget** and a **platform**:
 
-- **Frontend Widget:** Lightweight, embeddable JS & React component.
-- **Challenge Engine:** Runs on Bolt.new (React + Tailwind + shadcn/ui).
-- **Database & Logic:** Supabase with secure row-level access.
-- **Voice/Avatar Challenge:** Integrated with Tavus for real-time video prompts.
-- **AI Content Generation:** Powered by OpenAI APIs to keep challenges novel and relevant.
+- **Frontend Widget:** Lightweight, embeddable JS & React component with multiple challenge types.
+- **Challenge Engine:** Built with React, TypeScript, Tailwind CSS, and shadcn/ui.
+- **Backend & Database:** Supabase with secure row-level access and edge functions.
+- **AI Content Generation:** Integrated with Google Gemini for dynamic challenge creation.
+- **Video Verification:** Tavus-powered video agent for conversational verification.
+- **Bot Detection:** ML-based behavioral analysis to detect sophisticated bots.
+- **Performance Optimization:** Lazy-loading, code-splitting, and caching for fast loads.
+- **Accessibility:** WCAG AA compliant with keyboard navigation, screen reader support, and high contrast modes.
+
+---
+
+### 🏆 Key Accomplishments
+
+1. **Challenge Types:** Implemented 7 different cognitive challenges targeting various human abilities
+2. **AI Generation:** Created AI-assisted challenge generation system using Gemini API
+3. **Video Verification:** Integrated Tavus API for video-based verification
+4. **Bot Detection:** Developed advanced behavioral analysis system to detect sophisticated bots
+5. **Admin Dashboard:** Built comprehensive admin interface for analytics and challenge management
+6. **API System:** Created secure API key management for integration with client websites
+7. **Multi-Platform:** Responsive design works across desktop, tablet and mobile devices
+8. **Clear Pricing:** Established transparent pricing tiers for different business needs
 
 ---
 
@@ -90,7 +107,7 @@ Yuno becomes the **invisible thinking layer** of the internet — quietly verify
 ## 🏁 Our Promise
 
 **To developers:** Integration is easy. Performance is fast. Data is structured and useful.  
-**To users:** It’s not just a checkpoint — it’s a microgame that matters.  
+**To users:** It's not just a checkpoint — it's a microgame that matters.  
 **To the future:** Every challenge you complete helps teach the next generation of AI how to reason, empathize, and align with human values.
 
 ---

@@ -20,6 +20,9 @@ Yuno is **the internet's first Proof of Mind layer** — a next-generation human
 - **Bot Detection**: Advanced behavioral analysis with 99.7% accuracy
 - **Developer-Friendly**: Easy integration with just a few lines of code
 - **Privacy-First**: No personal data collection, fully GDPR compliant
+- **AI-Powered Content Generation**: Create custom challenges with Gemini AI
+- **Video Verification**: Revolutionary AI-powered video agent verification
+- **Multi-Modal Challenges**: From sentiment analysis to pattern recognition
 
 ## 🏆 Bolt.new Hackathon Submission
 
@@ -35,8 +38,8 @@ Yuno is **the internet's first Proof of Mind layer** — a next-generation human
 - **Frontend**: React, TypeScript, Tailwind CSS, shadcn/ui
 - **Backend**: Node.js, Supabase
 - **AI/ML**: Custom models for bot detection and challenge generation
-- **Deployment**: Vercel, Cloudflare Workers
-- **APIs**: OpenAI, Tavus (for avatar challenges)
+- **APIs**: Gemini AI, Tavus (for video challenges)
+- **Deployment**: Netlify, Supabase Functions
 
 ## 🎮 Try It Out
 
@@ -118,16 +121,9 @@ npm run dev
 
 - [PROJECT DOCS](https://github.com/sifeddinemeb/yuno-docs)
 
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Built for the Bolt.new Hackathon 2025
-- Special thanks to the open-source community
-- Inspired by the need for better online verification
 
 ## 📬 Contact
 
