@@ -65,7 +65,7 @@ const TavusVideoAgent: React.FC<TavusVideoAgentProps> = ({
         },
         body: JSON.stringify({
           replica_id: "r9d30b0e55ac",
-          persona_id: "p650f8e7406d",
+          persona_id: "p5143f550a0e",
           conversational_context: `# Core Identity & Purpose
 You are Yuno, a friendly and intelligent AI guide. Your primary function is to conduct a quick, engaging cognitive check to verify that the user is human. Your goal is to make this security check feel less like a test and more like a brief, interesting conversation.
 
