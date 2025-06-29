@@ -14,6 +14,7 @@ import { lazy, Suspense } from 'react';
 const Vision = lazy(() => import('./pages/Vision/Vision'));
 const Impact = lazy(() => import('./pages/Impact/Impact'));
 const Demo = lazy(() => import('./pages/Demo/Demo'));
+const Pricing = lazy(() => import('./pages/Pricing/Pricing'));
 const Login = lazy(() => import('./pages/auth/Login/Login'));
 const SignUp = lazy(() => import('./pages/auth/SignUp/SignUp'));
 
@@ -111,6 +112,13 @@ function App() {
                   <ErrorBoundary fallbackRender={errorFallback}>
                     <Suspense fallback={<PageLoader />}>
                       <Impact />
+                    </Suspense>
+                  </ErrorBoundary>
+                } />
+                <Route path="/pricing" element={
+                  <ErrorBoundary fallbackRender={errorFallback}>
+                    <Suspense fallback={<PageLoader />}>
+                      <Pricing />
                     </Suspense>
                   </ErrorBoundary>
                 } />
