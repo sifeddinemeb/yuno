@@ -1,68 +1,73 @@
-import { supabase } from '../supabase';
+import { supabase } from './supabase';
 
 /**
- * Helper library for interacting with Supabase Edge Functions
- * Handles proper error handling and parameter validation
+ * Calls a Supabase Edge Function with proper error handling
  */
-
-// Call a Supabase Edge Function with parameters
-export const callEdgeFunction = async <T = any>(
-  functionName: string, 
-  params?: any, 
-  options?: {
-    headers?: Record<string, string>;
-    noAuth?: boolean;
-  }
-): Promise<T> => {
+export const callEdgeFunction = async (functionName: string, payload: any): Promise<any> => {
   try {
-    // Validate function name
-    if (!functionName || typeof functionName !== 'string') {
-      throw new Error('Invalid function name');
-    }
-
-    // Headers to include
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...(options?.headers || {})
-    };
-
-    // Call the Edge Function
-    const { data, error } = await supabase.functions.invoke<T>(
-      functionName, 
-      {
-        body: params || {},
-        headers
-      }
-    );
+    const { data, error } = await supabase.functions.invoke(functionName, {
+      body: JSON.stringify(payload),
+    });
 
     if (error) {
-      console.error(`Edge function "${functionName}" error:`, error);
-      throw new Error(error.message || `Error calling ${functionName}`);
+      // Handle different types of errors appropriately
+      if (error.message?.includes('404') || error.message?.includes('not found')) {
+        console.warn(`Edge function ${functionName} returned 404:`, error.message);
+        return null; // Return null for 404s instead of throwing
+      }
+      
+      if (error.message?.includes('403') || error.message?.includes('Unauthorized')) {
+        console.warn(`Edge function ${functionName} returned 403:`, error.message);
+        return null; // Return null for unauthorized access
+      }
+
+      console.error(`Edge function ${functionName} error:`, error);
+      throw new Error(`Edge Function returned a non-2xx status code`);
     }
 
-    if (data === null && !options?.noAuth) {
-      throw new Error('Authentication required');
+    return data;
+  } catch (error: any) {
+    console.error(`Failed to call edge function "${functionName}":`, error);
+    
+    // Check if it's a network error or specific HTTP status
+    if (error.message?.includes('404') || error.message?.includes('not found')) {
+      console.warn(`Environment variable not found in edge function ${functionName}`);
+      return null; // Return null for missing env vars instead of throwing
     }
-
-    return data as T;
-  } catch (err: any) {
-    console.error(`Failed to call edge function "${functionName}":`, err);
-    throw new Error(`Edge function error: ${err.message}`);
+    
+    throw new Error(`Edge Function returned a non-2xx status code`);
   }
 };
 
-// Get environment variables securely through Edge Functions
-export const getEnvVariable = async (key: string): Promise<string | null> => {
+/**
+ * Gets an environment variable from the edge function
+ */
+export const getEnvVariable = async (key: string): Promise<{ key: string; value: string } | null> => {
   try {
-    const result = await callEdgeFunction<{value: string | null}>('get-env-var', { key });
+    const response = await callEdgeFunction('get-env-var', { key });
+    
+    // If response is null (404/403), return null gracefully
+    if (!response) {
+      console.warn(`Environment variable ${key} not available`);
+      return null;
+    }
+    
+    return response;
+  } catch (error) {
+    console.warn(`Failed to get environment variable ${key}:`, error);
+    return null; // Return null instead of re-throwing
+  }
+};
+
+/**
+ * Gets an API key with proper fallback handling
+ */
+export const getApiKey = async (keyName: string): Promise<string | null> => {
+  try {
+    const result = await getEnvVariable(keyName);
     return result?.value || null;
-  } catch (err) {
-    console.warn(`Could not retrieve environment variable ${key}:`, err);
+  } catch (error) {
+    console.warn(`Error getting API key ${keyName}:`, error);
     return null;
   }
-};
-
-// Specific function to get API keys securely
-export const getApiKey = async (keyName: string): Promise<string | null> => {
-  return await getEnvVariable(keyName);
 };
