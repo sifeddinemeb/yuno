@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Shield, Brain, Zap, CheckCircle, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -5,8 +6,16 @@ import Button from '../../components/ui/Button/Button';
 import Card from '../../components/ui/Card/Card';
 import PublicNavbar from '../../components/layout/PublicNavbar/PublicNavbar';
 import YunoWidget from '../../components/widget/YunoWidget/YunoWidget';
+import TavusVideoAgent from '../../components/video/TavusVideoAgent/TavusVideoAgent';
 
 const Vision = () => {
+  const [videoAgentCompleted, setVideoAgentCompleted] = useState(false);
+
+  const handleConversationEnd = (success: boolean) => {
+    setVideoAgentCompleted(true);
+    console.log('Video agent conversation ended with success:', success);
+  };
+
   return (
     <div>
       <PublicNavbar />
@@ -18,7 +27,7 @@ const Vision = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center"
-          >
+          >            
             <h2 className="text-4xl md:text-6xl font-extrabold mb-6">
               Stop Annoying Users.<br className="hidden md:block" />
               <span className="bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">Start Fueling AI.</span>
@@ -29,18 +38,31 @@ const Vision = () => {
 delightful micro-challenges that delight users while training tomorrow's AI.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/demo">
-                <Button size="lg" className="px-8">
-                  Try Live Demo <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Link to="/impact">
-                <Button variant="secondary" size="lg" className="px-8">
-                  Learn More
-                </Button>
-              </Link>
+            <div className="max-w-3xl mx-auto mb-12">
+              <TavusVideoAgent 
+                agentName="Yuno"
+                onConversationEnd={handleConversationEnd}
+              />
             </div>
+            
+            {videoAgentCompleted && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center mt-8"
+              >
+                <Link to="/demo">
+                  <Button size="lg" className="px-8">
+                    Try Live Demo <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+                <Link to="/impact">
+                  <Button variant="secondary" size="lg" className="px-8">
+                    Learn More
+                  </Button>
+                </Link>
+              </motion.div>
+            )}
           </motion.div>
         </div>
         
