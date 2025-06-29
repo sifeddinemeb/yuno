@@ -111,20 +111,32 @@ const Challenges = () => {
     loadAnalytics();
   }, [challenges]);
 
-  // Fetch analytics for the first 10 challenges to avoid heavy loads
+  // Fetch analytics for challenges
   const loadAnalytics = async () => {
     if (!challenges.length) return;
+    
     try {
-      const ids = challenges.slice(0, 10).map(c => c.id);
-      const analyticsData = await getChallengeAnalytics(ids);
-      // Shape analytics into lookup record
+      // Take just the first batch to avoid overwhelming the database
+      const challengeBatch = challenges.slice(0, 10);
+      const ids = challengeBatch.map(c => c.id);
+      
+      // Make individual requests for each challenge to avoid UUID format issues
+      const analyticsPromises = ids.map(id => getChallengeAnalytics([id]));
+      const analyticsResults = await Promise.all(analyticsPromises);
+      
+      // Combine results into a lookup object
       const analyticsMap: Record<string, ChallengeAnalytics> = {};
-      analyticsData.forEach((a: any) => {
-        analyticsMap[a.challengeId] = a as ChallengeAnalytics;
+      analyticsResults.forEach(results => {
+        if (results && results.length > 0) {
+          const result = results[0];
+          analyticsMap[result.challengeId] = result;
+        }
       });
+      
       setChallengeAnalytics(analyticsMap);
     } catch (err) {
       console.error('Error loading analytics:', err);
+      // Non-critical, so we don't show an error message
     }
   };
 
@@ -945,30 +957,20 @@ const Challenges = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-hidden"
+            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto"
             onClick={() => setShowAIGenerator(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-gray-900 rounded-xl p-8 max-w-2xl w-full mx-4 border border-gray-700"
+              className="glass rounded-xl p-8 max-w-4xl w-full mx-4 border border-gray-700"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="text-center">
-                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-neon-purple/10 mb-4">
-                  <Brain className="h-8 w-8 text-neon-purple" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Coming Soon</h3>
-                <p className="text-gray-300 mb-6">
-                  AI Challenge Generation is under development. Please check back later!
-                </p>
-                <div className="mt-6">
-                  <Button onClick={() => setShowAIGenerator(false)}>
-                    Got it!
-                  </Button>
-                </div>
-              </div>
+              <AIContentGenerator 
+                onContentGenerated={handleAIContentGenerated}
+                onClose={() => setShowAIGenerator(false)}
+              />
             </motion.div>
           </motion.div>
         )}

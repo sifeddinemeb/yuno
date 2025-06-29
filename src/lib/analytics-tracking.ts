@@ -240,48 +240,31 @@ export const getChallengeAnalytics = async (challengeIds: string[]): Promise<Cha
       return [];
     }
 
-    const { data: responses, error } = await supabase
-      .from('user_responses')
-      .select('*')
-      .in('challenge_id', validChallengeIds);
-
-    if (error) throw error;
-    if (!responses || responses.length === 0) {
-      // Return empty analytics for each challenge ID
-      return validChallengeIds.map(challengeId => ({
-        challengeId,
-        challengeType: 'Unknown',
-        totalAttempts: 0,
-        successfulAttempts: 0,
-        averageResponseTime: 0,
-        difficultyRating: 0,
-        userSatisfaction: 0,
-        completionRate: 0,
-        retryRate: 0,
-        errorRate: 0,
-        deviceBreakdown: {},
-        timeOfDayBreakdown: {},
-        botDetectionConfidence: 0
-      }));
-    }
-
-    // Group responses by challenge_id
-    const responsesByChallenge: Record<string, any[]> = {};
-    responses.forEach(response => {
-      const challengeId = response.challenge_id;
-      if (!responsesByChallenge[challengeId]) {
-        responsesByChallenge[challengeId] = [];
+    // For each challenge ID, get responses - uses individual queries to avoid UUID format issues
+    const resultsPromises = validChallengeIds.map(async (challengeId) => {
+      const { data: responses, error } = await supabase
+        .from('user_responses')
+        .select('*')
+        .eq('challenge_id', challengeId);
+      
+      if (error) {
+        console.error(`Error fetching responses for challenge ${challengeId}:`, error);
+        return null;
       }
-      responsesByChallenge[challengeId].push(response);
+      
+      return { challengeId, responses: responses || [] };
     });
-
+    
+    const results = await Promise.all(resultsPromises);
+    const validResults = results.filter(result => result !== null) as { challengeId: string; responses: any[] }[];
+    
     // Calculate analytics for each challenge
     const analyticsResults: ChallengeAnalytics[] = [];
 
-    for (const challengeId of validChallengeIds) {
-      const challengeResponses = responsesByChallenge[challengeId] || [];
+    for (const result of validResults) {
+      const { challengeId, responses } = result;
       
-      if (challengeResponses.length === 0) {
+      if (responses.length === 0) {
         // No responses for this challenge
         analyticsResults.push({
           challengeId,
@@ -301,13 +284,13 @@ export const getChallengeAnalytics = async (challengeIds: string[]): Promise<Cha
         continue;
       }
 
-      const totalAttempts = challengeResponses.length;
-      const successfulAttempts = challengeResponses.filter(r => r.is_human).length;
-      const averageResponseTime = challengeResponses.reduce((sum, r) => sum + (r.response_time_ms || 0), 0) / totalAttempts;
+      const totalAttempts = responses.length;
+      const successfulAttempts = responses.filter(r => r.is_human).length;
+      const averageResponseTime = responses.reduce((sum, r) => sum + (r.response_time_ms || 0), 0) / totalAttempts;
       
       // Calculate device breakdown
       const deviceBreakdown: Record<string, number> = {};
-      challengeResponses.forEach(r => {
+      responses.forEach(r => {
         const deviceInfo = parseUserAgent(r.user_agent);
         const deviceType = deviceInfo.deviceType;
         deviceBreakdown[deviceType] = (deviceBreakdown[deviceType] || 0) + 1;
@@ -315,16 +298,16 @@ export const getChallengeAnalytics = async (challengeIds: string[]): Promise<Cha
 
       // Calculate time of day breakdown
       const timeOfDayBreakdown: Record<string, number> = {};
-      challengeResponses.forEach(r => {
+      responses.forEach(r => {
         const hour = new Date(r.created_at).getHours();
         const timeSlot = getTimeSlot(hour);
         timeOfDayBreakdown[timeSlot] = (timeOfDayBreakdown[timeSlot] || 0) + 1;
       });
 
-      const metrics = calculateChallengeMetrics(challengeResponses);
+      const metrics = calculateChallengeMetrics(responses);
 
       // Calculate retry rate
-      const uniqueSessions = new Set(challengeResponses.map(r => r.session_id)).size;
+      const uniqueSessions = new Set(responses.map(r => r.session_id)).size;
       const retryRate = uniqueSessions > 0 ? (totalAttempts - uniqueSessions) / uniqueSessions : 0;
 
       // Calculate average bot detection confidence
@@ -333,7 +316,7 @@ export const getChallengeAnalytics = async (challengeIds: string[]): Promise<Cha
 
       analyticsResults.push({
         challengeId,
-        challengeType: challengeResponses[0].challenge_type || 'Unknown',
+        challengeType: responses[0].challenge_type || 'Unknown',
         totalAttempts,
         successfulAttempts,
         averageResponseTime: Math.round(averageResponseTime),
@@ -352,22 +335,7 @@ export const getChallengeAnalytics = async (challengeIds: string[]): Promise<Cha
 
   } catch (error) {
     console.error('Error getting challenge analytics:', error);
-    // Return empty analytics for all requested challenge IDs instead of null
-    return (challengeIds || []).map(challengeId => ({
-      challengeId,
-      challengeType: 'Unknown',
-      totalAttempts: 0,
-      successfulAttempts: 0,
-      averageResponseTime: 0,
-      difficultyRating: 0,
-      userSatisfaction: 0,
-      completionRate: 0,
-      retryRate: 0,
-      errorRate: 0,
-      deviceBreakdown: {},
-      timeOfDayBreakdown: {},
-      botDetectionConfidence: 0
-    }));
+    throw error;
   }
 };
 
