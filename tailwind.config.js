@@ -2,6 +2,9 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   theme: {
     extend: {
       colors: {
@@ -107,7 +110,8 @@ export default {
       addBase({
         'html': { 
           fontSize: '16px', 
-          overflowX: 'hidden' 
+          overflowX: 'hidden',
+          scrollBehavior: 'smooth',
         },
         'body': {
           maxWidth: '100vw',
@@ -117,6 +121,13 @@ export default {
           borderCollapse: 'separate',
           borderSpacing: 0,
           width: '100%'
+        },
+        'button, a, input, select, textarea': {
+          outline: 'none',
+          '-webkit-tap-highlight-color': 'transparent',
+        },
+        '::selection': {
+          backgroundColor: 'rgba(0, 212, 255, 0.3)',
         }
       });
     }

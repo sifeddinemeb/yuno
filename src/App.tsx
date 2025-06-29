@@ -8,6 +8,24 @@ import ThemeProvider from './components/layout/ThemeProvider/ThemeProvider';
 import BackgroundBlobs from './components/layout/BackgroundBlobs/BackgroundBlobs';
 import ScrollToTop from './components/layout/ScrollToTop/ScrollToTop';
 import { BoltNewBadge } from '@/components/ui/bolt-new-badge';
+import { lazy, Suspense } from 'react';
+
+// Lazy load pages for performance
+const Vision = lazy(() => import('./pages/Vision/Vision'));
+const Impact = lazy(() => import('./pages/Impact/Impact'));
+const Demo = lazy(() => import('./pages/Demo/Demo'));
+const Login = lazy(() => import('./pages/auth/Login/Login'));
+const SignUp = lazy(() => import('./pages/auth/SignUp/SignUp'));
+
+// Admin pages
+const Dashboard = lazy(() => import('./pages/admin/Dashboard/Dashboard'));
+const Analytics = lazy(() => import('./pages/admin/Analytics/Analytics'));
+const Challenges = lazy(() => import('./pages/admin/Challenges/Challenges'));
+const ApiKeys = lazy(() => import('./pages/admin/ApiKeys/ApiKeys'));
+const Settings = lazy(() => import('./pages/admin/Settings/Settings'));
+
+// Navigation
+const Navigation = lazy(() => import('./components/layout/Navigation/Navigation'));
 
 // Generic error fallback for all boundaries
 const errorFallback = ({ error }: { error: Error }) => (
@@ -15,17 +33,13 @@ const errorFallback = ({ error }: { error: Error }) => (
     Something went wrong: {error.message}
   </div>
 );
-import Navigation from './components/layout/Navigation/Navigation';
-import Vision from './pages/Vision/Vision';
-import Impact from './pages/Impact/Impact';
-import Demo from './pages/Demo/Demo';
-import Login from './pages/auth/Login/Login';
-import SignUp from './pages/auth/SignUp/SignUp';
-import Dashboard from './pages/admin/Dashboard/Dashboard';
-import Analytics from './pages/admin/Analytics/Analytics';
-import Challenges from './pages/admin/Challenges/Challenges';
-import ApiKeys from './pages/admin/ApiKeys/ApiKeys';
-import Settings from './pages/admin/Settings/Settings';
+
+// Loading fallback
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-dark-100">
+    <div className="w-12 h-12 border-4 border-neon-blue border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 function App() {
   const { adminUser, envError, authReady } = useAuth() as any;
@@ -33,7 +47,6 @@ function App() {
   if (envError) {
     return <MissingEnvScreen />;
   }
-  
 
   // Show loading spinner while checking authentication with progressive status hints
   if (!authReady) {
@@ -79,7 +92,7 @@ function App() {
 
   return (
     <ThemeProvider>
-        <BackgroundBlobs />
+      <BackgroundBlobs />
       <ErrorBoundary fallbackRender={errorFallback}>
         <NetworkErrorHandler retryFn={() => Promise.resolve()}>
           <Router>
@@ -89,17 +102,23 @@ function App() {
                 {/* Public Routes */}
                 <Route path="/" element={
                   <ErrorBoundary fallbackRender={errorFallback}>
-                    <Vision />
+                    <Suspense fallback={<PageLoader />}>
+                      <Vision />
+                    </Suspense>
                   </ErrorBoundary>
                 } />
                 <Route path="/impact" element={
                   <ErrorBoundary fallbackRender={errorFallback}>
-                    <Impact />
+                    <Suspense fallback={<PageLoader />}>
+                      <Impact />
+                    </Suspense>
                   </ErrorBoundary>
                 } />
                 <Route path="/demo" element={
                   <ErrorBoundary fallbackRender={errorFallback}>
-                    <Demo />
+                    <Suspense fallback={<PageLoader />}>
+                      <Demo />
+                    </Suspense>
                   </ErrorBoundary>
                 } />
                 
@@ -108,7 +127,9 @@ function App() {
                   path="/auth/login" 
                   element={adminUser ? <Navigate to="/admin" replace /> : (
                     <ErrorBoundary fallbackRender={errorFallback}>
-                      <Login />
+                      <Suspense fallback={<PageLoader />}>
+                        <Login />
+                      </Suspense>
                     </ErrorBoundary>
                   )} 
                 />
@@ -116,7 +137,9 @@ function App() {
                   path="/auth/signup" 
                   element={adminUser ? <Navigate to="/admin" replace /> : (
                     <ErrorBoundary fallbackRender={errorFallback}>
-                      <SignUp />
+                      <Suspense fallback={<PageLoader />}>
+                        <SignUp />
+                      </Suspense>
                     </ErrorBoundary>
                   )} 
                 />
@@ -125,16 +148,38 @@ function App() {
                 <Route path="/admin/*" element={
                   adminUser ? (
                     <div className="flex h-screen overflow-hidden">
-                      <Navigation />
+                      <Suspense fallback={<div className="w-64 bg-dark-200 animate-pulse"></div>}>
+                        <Navigation />
+                      </Suspense>
                       <div className="flex-1 ml-0 md:ml-64 min-w-0 flex flex-col">
                         <div className="p-8 overflow-y-auto flex-1">
                           <ErrorBoundary fallbackRender={errorFallback}>
                             <Routes>
-                              <Route path="/" element={<Dashboard />} />
-                              <Route path="/analytics" element={<Analytics />} />
-                              <Route path="/challenges" element={<Challenges />} />
-                              <Route path="/api-keys" element={<ApiKeys />} />
-                              <Route path="/settings" element={<Settings />} />
+                              <Route path="/" element={
+                                <Suspense fallback={<PageLoader />}>
+                                  <Dashboard />
+                                </Suspense>
+                              } />
+                              <Route path="/analytics" element={
+                                <Suspense fallback={<PageLoader />}>
+                                  <Analytics />
+                                </Suspense>
+                              } />
+                              <Route path="/challenges" element={
+                                <Suspense fallback={<PageLoader />}>
+                                  <Challenges />
+                                </Suspense>
+                              } />
+                              <Route path="/api-keys" element={
+                                <Suspense fallback={<PageLoader />}>
+                                  <ApiKeys />
+                                </Suspense>
+                              } />
+                              <Route path="/settings" element={
+                                <Suspense fallback={<PageLoader />}>
+                                  <Settings />
+                                </Suspense>
+                              } />
                             </Routes>
                           </ErrorBoundary>
                         </div>

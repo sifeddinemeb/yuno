@@ -164,11 +164,11 @@
   .animate-blob-delay-4 { animation-delay: 8s; }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-neon-blue to-neon-purple text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-neon-blue/25 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2;
+    @apply bg-gradient-to-r from-neon-blue to-neon-purple text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-neon-blue/25 hover:scale-105 focus:outline-none disabled:opacity-70 dark:disabled:text-gray-300 disabled:text-gray-600 disabled:hover:scale-100 disabled:hover:shadow-none;
   }
   
   .btn-secondary {
-    @apply glass px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-glass-light hover:scale-105 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2;
+    @apply glass text-white hover:bg-glass-light hover:scale-105 disabled:hover:scale-100 disabled:hover:bg-transparent focus:outline-none;
   }
   
   .dark .btn-secondary {
@@ -180,7 +180,7 @@
   }
   
   .btn-ghost {
-    @apply text-neon-blue hover:text-neon-purple hover:bg-neon-blue/10 rounded-lg px-2 py-1 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2;
+    @apply text-neon-blue hover:text-neon-purple hover:bg-neon-blue/10 rounded-lg px-2 py-1 transition-colors duration-300 focus:outline-none;
   }
   
   .input-field {
@@ -213,7 +213,7 @@
   
   /* Navigation styles */
   .nav-link {
-    @apply flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2;
+    @apply flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300 focus:outline-none;
   }
   
   .dark .nav-link {
@@ -347,9 +347,13 @@
     border-radius: 50%;
   }
 
-  /* Focus styles for better accessibility */
+  /* Focus styles for better accessibility - FIX ANNOYING OUTLINE */
+  :focus {
+    @apply outline-none;
+  }
+  
   :focus-visible {
-    @apply outline-none ring-2 ring-neon-blue ring-offset-2;
+    @apply outline-none ring-2 ring-neon-blue ring-offset-2 ring-offset-dark-100 dark:ring-offset-dark-100 light:ring-offset-white;
   }
   
   /* Better overflow handling for modals */
@@ -443,6 +447,10 @@
   @apply bg-gray-800 text-gray-100;
 }
 
+.light select.input-field option {
+  @apply bg-white text-gray-800;
+}
+
 /* Reduce heavy blur on devices that struggle */
 @media (prefers-reduced-transparency: reduce) {
   .glass, .glass-dark {
@@ -466,4 +474,46 @@
 
 .light .text-gray-300 {
   @apply text-gray-700;
+}
+
+/* Fix light mode text issues on public pages */
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+  @apply text-gray-900;
+}
+
+.light p {
+  @apply text-gray-800;
+}
+
+.light .text-white {
+  @apply text-gray-900;
+}
+
+/* Performance optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.will-change-contents {
+  will-change: contents;
+}
+
+/* Improve transitions */
+.smooth-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+/* Video Agent Container */
+.video-agent-container {
+  @apply rounded-xl overflow-hidden shadow-xl;
+  aspect-ratio: 16 / 9;
+}
+
+/* Fix iframe border issues */
+iframe {
+  @apply border-0 outline-none;
 }
