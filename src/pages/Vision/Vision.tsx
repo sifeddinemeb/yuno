@@ -19,15 +19,6 @@ const Vision = () => {
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-            <div className="flex items-center justify-center mb-6">
-              <div className="w-12 h-12 bg-gradient-to-r from-neon-blue to-neon-purple rounded-xl flex items-center justify-center mr-4">
-                <Shield className="w-7 h-7 text-white" />
-              </div>
-              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
-                Yuno
-              </h1>
-            </div>
-            
             <h2 className="text-4xl md:text-6xl font-extrabold mb-6">
               Stop Annoying Users.<br className="hidden md:block" />
               <span className="bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">Start Fueling AI.</span>

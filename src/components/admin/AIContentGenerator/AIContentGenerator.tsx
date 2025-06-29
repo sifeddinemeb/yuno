@@ -39,6 +39,7 @@ const AIContentGenerator = ({ onContentGenerated, onClose }: AIContentGeneratorP
   const [previewContent, setPreviewContent] = useState<GeneratedContent | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [apiStatus, setApiStatus] = useState<'unknown' | 'connected' | 'failed'>('unknown');
 
   const [generationSettings, setGenerationSettings] = useState<ContentGenerationRequest>({
     challengeType: 'SentimentSpectrum',
@@ -70,9 +71,12 @@ const AIContentGenerator = ({ onContentGenerated, onClose }: AIContentGeneratorP
   useEffect(() => {
     const initGenerator = async () => {
       try {
+        setApiStatus('unknown');
         await geminiGenerator.initialize();
+        setApiStatus('connected');
       } catch (err) {
-        console.warn("Couldn't initialize Gemini generator, will use mock data:", err);
+        console.warn("Couldn't initialize Gemini generator:", err);
+        setApiStatus('failed');
       }
     };
     
@@ -133,20 +137,26 @@ const AIContentGenerator = ({ onContentGenerated, onClose }: AIContentGeneratorP
       const contentToApprove = generatedContent.filter(content => contentIds.includes(content.id));
       
       for (const content of contentToApprove) {
-        // Create challenge in database
-        await challengeApi.create({
-          type: content.type,
-          title: content.title,
-          description: content.description,
-          content: content.content,
-          correct_answer: content.correct_answer,
-          signal_tags: [...content.signal_tags, 'ai-generated'],
-          input_mode: content.input_mode,
-          difficulty: content.difficulty,
-          is_active: false, // Start as draft for human review
-          generation_metadata: content.generation_metadata,
-          quality_score: content.quality_score
-        });
+        try {
+          // Create challenge in database
+          await challengeApi.create({
+            type: content.type,
+            title: content.title,
+            description: content.description,
+            content: content.content,
+            correct_answer: content.correct_answer,
+            signal_tags: [...content.signal_tags, 'ai-generated'],
+            input_mode: content.input_mode,
+            difficulty: content.difficulty,
+            is_active: false, // Start as draft for human review
+            generation_metadata: content.generation_metadata,
+            quality_score: content.quality_score
+          });
+          console.log('Successfully created challenge:', content.title);
+        } catch (err: any) {
+          console.error('Error creating challenge:', content.title, err);
+          throw new Error(`Failed to save challenge "${content.title}": ${err.message}`);
+        }
       }
 
       setSuccess(`Successfully created ${contentToApprove.length} challenge${contentToApprove.length > 1 ? 's' : ''} in the database!`);
@@ -199,6 +209,20 @@ const AIContentGenerator = ({ onContentGenerated, onClose }: AIContentGeneratorP
             <X className="w-5 h-5" />
           </Button>
         )}
+      </div>
+
+      {/* API Status Indicator */}
+      <div className="flex items-center">
+        <div className={`w-3 h-3 rounded-full mr-2 ${
+          apiStatus === 'connected' ? 'bg-neon-green' : 
+          apiStatus === 'failed' ? 'bg-neon-red' : 
+          'bg-neon-orange'
+        }`}></div>
+        <span className="text-sm text-muted">
+          {apiStatus === 'connected' ? 'Gemini API Connected' : 
+           apiStatus === 'failed' ? 'API Connection Failed (Using Mock Data)' : 
+           'Checking API connection...'}
+        </span>
       </div>
 
       {/* Status Messages */}

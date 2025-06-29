@@ -240,28 +240,32 @@ export const getChallengeAnalytics = async (challengeIds: string[]): Promise<Cha
       return [];
     }
 
-    // For each challenge ID, get responses - uses individual queries to avoid UUID format issues
-    const resultsPromises = validChallengeIds.map(async (challengeId) => {
-      const { data: responses, error } = await supabase
-        .from('user_responses')
-        .select('*')
-        .eq('challenge_id', challengeId);
-      
-      if (error) {
-        console.error(`Error fetching responses for challenge ${challengeId}:`, error);
-        return null;
-      }
-      
-      return { challengeId, responses: responses || [] };
-    });
+    // Process one challenge ID at a time to avoid query parameter formatting issues
+    const results = [];
     
-    const results = await Promise.all(resultsPromises);
-    const validResults = results.filter(result => result !== null) as { challengeId: string; responses: any[] }[];
+    for (const challengeId of validChallengeIds) {
+      try {
+        const { data: responses, error } = await supabase
+          .from('user_responses')
+          .select('*')
+          .eq('challenge_id', challengeId);
+        
+        if (error) {
+          console.error(`Error fetching responses for challenge ${challengeId}:`, error);
+          continue;
+        }
+        
+        results.push({ challengeId, responses: responses || [] });
+      } catch (err) {
+        console.error(`Error processing challenge ${challengeId}:`, err);
+        continue;
+      }
+    }
     
     // Calculate analytics for each challenge
     const analyticsResults: ChallengeAnalytics[] = [];
 
-    for (const result of validResults) {
+    for (const result of results) {
       const { challengeId, responses } = result;
       
       if (responses.length === 0) {
@@ -332,7 +336,6 @@ export const getChallengeAnalytics = async (challengeIds: string[]): Promise<Cha
     }
 
     return analyticsResults;
-
   } catch (error) {
     console.error('Error getting challenge analytics:', error);
     throw error;

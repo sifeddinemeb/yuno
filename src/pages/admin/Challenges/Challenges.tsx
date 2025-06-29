@@ -71,6 +71,7 @@ const Challenges = () => {
   const [selectedChallenges, setSelectedChallenges] = useState<string[]>([]);
   const [showAnalytics, setShowAnalytics] = useState<string | null>(null);
   const [challengeAnalytics, setChallengeAnalytics] = useState<Record<string, ChallengeAnalytics>>({});
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
 
   const [newChallenge, setNewChallenge] = useState({
     type: 'SentimentSpectrum',
@@ -118,6 +119,7 @@ const Challenges = () => {
     if (!challenges.length) return;
     
     try {
+      setLoadingAnalytics(true);
       // Take just the first batch to avoid overwhelming the database
       const challengeBatch = challenges.slice(0, 10);
       
@@ -140,6 +142,8 @@ const Challenges = () => {
     } catch (err) {
       console.error('Error loading analytics:', err);
       // Non-critical, so we don't show an error message
+    } finally {
+      setLoadingAnalytics(false);
     }
   };
 
@@ -637,7 +641,12 @@ const Challenges = () => {
                             </span>
                           </td>
                           <td className="py-3 px-4">
-                            {analytics ? (
+                            {loadingAnalytics ? (
+                              <div className="flex items-center">
+                                <RefreshCw className="w-3 h-3 animate-spin mr-2" />
+                                <span className="text-xs text-muted">Loading...</span>
+                              </div>
+                            ) : analytics ? (
                               <div className="text-sm">
                                 <div className="flex items-center space-x-2">
                                   <TrendingUp className="w-3 h-3 text-neon-green" />
