@@ -61,16 +61,20 @@ class GeminiContentGenerator {
           
           if (data?.value) {
             this.apiKey = data.value;
+            this.mockData = false;
           } else if (error) {
-            throw new Error(`Failed to fetch API key: ${error.message}`);
+            console.warn(`Failed to fetch API key: ${error.message}`);
+            this.mockData = true;
           }
         } catch (backendError) {
           console.warn('Failed to fetch API key from backend, will use mock data:', backendError);
           this.mockData = true;
         }
+      } else {
+        this.mockData = false;
       }
 
-      console.log('Gemini API initialized successfully');
+      console.log(`Gemini API initialized successfully (using ${this.mockData ? 'mock data' : 'real API'})`);
     } catch (error) {
       console.error('Failed to initialize Gemini API:', error);
       this.mockData = true;
@@ -351,7 +355,18 @@ Adapt the content structure based on the challenge requirements.`;
       const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/) || response.match(/\{[\s\S]*\}/);
       const jsonString = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : response;
       
-      const parsed = JSON.parse(jsonString);
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonString.trim());
+      } catch (e) {
+        // If direct parsing fails, try to find and extract the JSON object
+        const jsonContent = jsonString.match(/(\{[\s\S]*\})/);
+        if (jsonContent && jsonContent[1]) {
+          parsed = JSON.parse(jsonContent[1]);
+        } else {
+          throw new Error("Couldn't extract valid JSON from the response");
+        }
+      }
       
       // Validate required fields
       if (!parsed.title || !parsed.description || !parsed.content || !parsed.correct_answer) {

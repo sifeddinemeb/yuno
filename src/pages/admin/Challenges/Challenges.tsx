@@ -108,30 +108,33 @@ const Challenges = () => {
   }, []);
 
   useEffect(() => {
-    loadAnalytics();
+    if (challenges.length > 0) {
+      loadAnalytics();
+    }
   }, [challenges]);
 
-  // Fetch analytics for challenges
+  // Fetch analytics for challenges - one at a time to avoid UUID format issues
   const loadAnalytics = async () => {
     if (!challenges.length) return;
     
     try {
       // Take just the first batch to avoid overwhelming the database
       const challengeBatch = challenges.slice(0, 10);
-      const ids = challengeBatch.map(c => c.id);
       
-      // Make individual requests for each challenge to avoid UUID format issues
-      const analyticsPromises = ids.map(id => getChallengeAnalytics([id]));
-      const analyticsResults = await Promise.all(analyticsPromises);
-      
-      // Combine results into a lookup object
+      // Process one challenge at a time to avoid query parameter issues
       const analyticsMap: Record<string, ChallengeAnalytics> = {};
-      analyticsResults.forEach(results => {
-        if (results && results.length > 0) {
-          const result = results[0];
-          analyticsMap[result.challengeId] = result;
+      
+      for (const challenge of challengeBatch) {
+        try {
+          const analytics = await getChallengeAnalytics([challenge.id]);
+          if (analytics && analytics.length > 0) {
+            analyticsMap[challenge.id] = analytics[0];
+          }
+        } catch (err) {
+          console.warn(`Error loading analytics for challenge ${challenge.id}:`, err);
+          // Continue with other challenges
         }
-      });
+      }
       
       setChallengeAnalytics(analyticsMap);
     } catch (err) {

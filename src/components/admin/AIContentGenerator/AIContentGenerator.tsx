@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, 
@@ -66,6 +66,19 @@ const AIContentGenerator = ({ onContentGenerated, onClose }: AIContentGeneratorP
     SocialDecoder: ['Sarcasm Detection', 'Cultural Nuances', 'Emotional Subtext', 'Communication Styles']
   };
 
+  // Initialize geminiGenerator when component mounts
+  useEffect(() => {
+    const initGenerator = async () => {
+      try {
+        await geminiGenerator.initialize();
+      } catch (err) {
+        console.warn("Couldn't initialize Gemini generator, will use mock data:", err);
+      }
+    };
+    
+    initGenerator();
+  }, []);
+
   const handleGenerate = async () => {
     try {
       setIsGenerating(true);
@@ -130,7 +143,9 @@ const AIContentGenerator = ({ onContentGenerated, onClose }: AIContentGeneratorP
           signal_tags: [...content.signal_tags, 'ai-generated'],
           input_mode: content.input_mode,
           difficulty: content.difficulty,
-          is_active: false // Start as draft for human review
+          is_active: false, // Start as draft for human review
+          generation_metadata: content.generation_metadata,
+          quality_score: content.quality_score
         });
       }
 
