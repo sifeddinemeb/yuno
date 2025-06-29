@@ -225,12 +225,54 @@ const validatePatternPlay = (challenge: Challenge, userAnswer: number): Validati
 /**
  * Enhanced PerceptionFlip validation with multiple acceptable answers
  */
-const validatePerceptionFlip = (challenge: Challenge, userAnswer: string): ValidationResult => {
-  const acceptableAnswers = challenge.correct_answer.acceptableAnswers || [challenge.correct_answer];
-  const isCorrect = acceptableAnswers.some(answer => 
-    answer.toLowerCase().includes(userAnswer.toLowerCase()) || 
-    userAnswer.toLowerCase().includes(answer.toLowerCase())
-  );
+const validatePerceptionFlip = (challenge: Challenge, userAnswer: any): ValidationResult => {
+  // Ensure userAnswer is a string
+  const userAnswerString = String(userAnswer || '').trim();
+  
+  // Check if correct_answer is properly formatted
+  if (!challenge.correct_answer) {
+    return {
+      isCorrect: false,
+      score: 0,
+      feedback: 'Challenge configuration error: missing correct answer',
+      difficulty: challenge.difficulty,
+      detailedFeedback: 'This challenge appears to be misconfigured. Please contact support.'
+    };
+  }
+  
+  // Handle different formats of correct_answer
+  let acceptableAnswers: string[] = [];
+  
+  if (typeof challenge.correct_answer === 'string') {
+    acceptableAnswers = [challenge.correct_answer];
+  } else if (Array.isArray(challenge.correct_answer)) {
+    acceptableAnswers = challenge.correct_answer.map(answer => String(answer || ''));
+  } else if (challenge.correct_answer.acceptableAnswers && Array.isArray(challenge.correct_answer.acceptableAnswers)) {
+    acceptableAnswers = challenge.correct_answer.acceptableAnswers.map(answer => String(answer || ''));
+  } else {
+    // Fallback: convert whatever format to string
+    acceptableAnswers = [String(challenge.correct_answer)];
+  }
+  
+  // Filter out empty strings and ensure all are strings
+  acceptableAnswers = acceptableAnswers.filter(answer => answer.length > 0);
+  
+  if (acceptableAnswers.length === 0) {
+    return {
+      isCorrect: false,
+      score: 0,
+      feedback: 'Challenge configuration error: no valid acceptable answers',
+      difficulty: challenge.difficulty,
+      detailedFeedback: 'This challenge appears to be misconfigured. Please contact support.'
+    };
+  }
+  
+  // Perform case-insensitive comparison
+  const isCorrect = acceptableAnswers.some(answer => {
+    const answerLower = answer.toLowerCase();
+    const userAnswerLower = userAnswerString.toLowerCase();
+    return answerLower.includes(userAnswerLower) || userAnswerLower.includes(answerLower);
+  });
   
   let feedback = '';
   let detailedFeedback = '';
@@ -255,9 +297,49 @@ const validatePerceptionFlip = (challenge: Challenge, userAnswer: string): Valid
 /**
  * Enhanced SocialDecoder validation with cultural context analysis
  */
-const validateSocialDecoder = (challenge: Challenge, userAnswer: string): ValidationResult => {
-  const acceptableAnswers = challenge.correct_answer.acceptableAnswers || [challenge.correct_answer];
-  const isCorrect = acceptableAnswers.includes(userAnswer);
+const validateSocialDecoder = (challenge: Challenge, userAnswer: any): ValidationResult => {
+  // Ensure userAnswer is a string
+  const userAnswerString = String(userAnswer || '').trim();
+  
+  // Check if correct_answer is properly formatted
+  if (!challenge.correct_answer) {
+    return {
+      isCorrect: false,
+      score: 0,
+      feedback: 'Challenge configuration error: missing correct answer',
+      difficulty: challenge.difficulty,
+      detailedFeedback: 'This challenge appears to be misconfigured. Please contact support.'
+    };
+  }
+  
+  // Handle different formats of correct_answer
+  let acceptableAnswers: string[] = [];
+  
+  if (typeof challenge.correct_answer === 'string') {
+    acceptableAnswers = [challenge.correct_answer];
+  } else if (Array.isArray(challenge.correct_answer)) {
+    acceptableAnswers = challenge.correct_answer.map(answer => String(answer || ''));
+  } else if (challenge.correct_answer.acceptableAnswers && Array.isArray(challenge.correct_answer.acceptableAnswers)) {
+    acceptableAnswers = challenge.correct_answer.acceptableAnswers.map(answer => String(answer || ''));
+  } else {
+    // Fallback: convert whatever format to string
+    acceptableAnswers = [String(challenge.correct_answer)];
+  }
+  
+  // Filter out empty strings
+  acceptableAnswers = acceptableAnswers.filter(answer => answer.length > 0);
+  
+  if (acceptableAnswers.length === 0) {
+    return {
+      isCorrect: false,
+      score: 0,
+      feedback: 'Challenge configuration error: no valid acceptable answers',
+      difficulty: challenge.difficulty,
+      detailedFeedback: 'This challenge appears to be misconfigured. Please contact support.'
+    };
+  }
+  
+  const isCorrect = acceptableAnswers.includes(userAnswerString);
   
   let feedback = '';
   let detailedFeedback = '';
@@ -275,7 +357,7 @@ const validateSocialDecoder = (challenge: Challenge, userAnswer: string): Valida
   
   // Give some credit for reasonable interpretations even if not the "correct" one
   const reasonableInterpretations = challenge.content.interpretations || [];
-  if (!isCorrect && reasonableInterpretations.includes(userAnswer)) {
+  if (!isCorrect && reasonableInterpretations.includes(userAnswerString)) {
     score = 80; // High partial credit for plausible interpretations
     feedback = 'Your interpretation is reasonable, though not the most likely intended meaning.';
   }
