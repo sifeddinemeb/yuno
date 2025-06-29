@@ -33,7 +33,7 @@ const Impact = () => {
             className="text-center"
           >
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              The <span className="text-white">CAPTCHA</span>
+              The <span className="text-primary">CAPTCHA</span>
               <br />
               <span className="text-neon-red">Crisis</span>
             </h1>
@@ -78,7 +78,7 @@ const Impact = () => {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-5xl font-bold text-primary mb-6">
-              The <span className="text-white">RealCaptcha</span>
+              The <span className="text-primary">RealCaptcha</span>
               <br />
               <span className="text-neon-blue">Revolution</span>
             </h2>

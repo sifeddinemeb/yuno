@@ -118,9 +118,6 @@ npm run dev
 
 - [PROJECT DOCS](https://github.com/sifeddinemeb/yuno-docs)
 
-## 🤝 Contributing
-
-We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) to get started.
 
 ## 📄 License
 
@@ -134,8 +131,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📬 Contact
 
-- Twitter: [@yunoverify](https://twitter.com/yunoverify)
-- Email: hello@yuno.tech
+- Email: Sifeddine.meb96@gmail.com
 - GitHub: [yuno-project](https://github.com/sifeddinemeb/yuno)
 
 ---

@@ -489,10 +489,6 @@
   @apply text-gray-800;
 }
 
-.light .text-white {
-  @apply text-gray-900;
-}
-
 /* Performance optimizations */
 .will-change-transform {
   will-change: transform;
