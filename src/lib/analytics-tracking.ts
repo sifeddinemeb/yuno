@@ -225,67 +225,149 @@ export const trackUserInteraction = async (data: {
 };
 
 /**
- * Get comprehensive challenge analytics
+ * Get comprehensive challenge analytics for multiple challenges
  */
-export const getChallengeAnalytics = async (challengeId: string): Promise<ChallengeAnalytics | null> => {
+export const getChallengeAnalytics = async (challengeIds: string[]): Promise<ChallengeAnalytics[]> => {
   try {
+    if (!challengeIds || challengeIds.length === 0) {
+      return [];
+    }
+
+    // Filter out any invalid IDs
+    const validChallengeIds = challengeIds.filter(id => id && typeof id === 'string' && id.trim().length > 0);
+    
+    if (validChallengeIds.length === 0) {
+      return [];
+    }
+
     const { data: responses, error } = await supabase
       .from('user_responses')
       .select('*')
-      .eq('challenge_id', challengeId);
+      .in('challenge_id', validChallengeIds);
 
     if (error) throw error;
-    if (!responses || responses.length === 0) return null;
+    if (!responses || responses.length === 0) {
+      // Return empty analytics for each challenge ID
+      return validChallengeIds.map(challengeId => ({
+        challengeId,
+        challengeType: 'Unknown',
+        totalAttempts: 0,
+        successfulAttempts: 0,
+        averageResponseTime: 0,
+        difficultyRating: 0,
+        userSatisfaction: 0,
+        completionRate: 0,
+        retryRate: 0,
+        errorRate: 0,
+        deviceBreakdown: {},
+        timeOfDayBreakdown: {},
+        botDetectionConfidence: 0
+      }));
+    }
 
-    const totalAttempts = responses.length;
-    const successfulAttempts = responses.filter(r => r.is_human).length;
-    const averageResponseTime = responses.reduce((sum, r) => sum + r.response_time_ms, 0) / totalAttempts;
-    
-    // Calculate device breakdown
-    const deviceBreakdown: Record<string, number> = {};
-    responses.forEach(r => {
-      const deviceInfo = parseUserAgent(r.user_agent);
-      const deviceType = deviceInfo.deviceType;
-      deviceBreakdown[deviceType] = (deviceBreakdown[deviceType] || 0) + 1;
+    // Group responses by challenge_id
+    const responsesByChallenge: Record<string, any[]> = {};
+    responses.forEach(response => {
+      const challengeId = response.challenge_id;
+      if (!responsesByChallenge[challengeId]) {
+        responsesByChallenge[challengeId] = [];
+      }
+      responsesByChallenge[challengeId].push(response);
     });
 
-    // Calculate time of day breakdown
-    const timeOfDayBreakdown: Record<string, number> = {};
-    responses.forEach(r => {
-      const hour = new Date(r.created_at).getHours();
-      const timeSlot = getTimeSlot(hour);
-      timeOfDayBreakdown[timeSlot] = (timeOfDayBreakdown[timeSlot] || 0) + 1;
-    });
+    // Calculate analytics for each challenge
+    const analyticsResults: ChallengeAnalytics[] = [];
 
-    const metrics = calculateChallengeMetrics(responses);
+    for (const challengeId of validChallengeIds) {
+      const challengeResponses = responsesByChallenge[challengeId] || [];
+      
+      if (challengeResponses.length === 0) {
+        // No responses for this challenge
+        analyticsResults.push({
+          challengeId,
+          challengeType: 'Unknown',
+          totalAttempts: 0,
+          successfulAttempts: 0,
+          averageResponseTime: 0,
+          difficultyRating: 0,
+          userSatisfaction: 0,
+          completionRate: 0,
+          retryRate: 0,
+          errorRate: 0,
+          deviceBreakdown: {},
+          timeOfDayBreakdown: {},
+          botDetectionConfidence: 0
+        });
+        continue;
+      }
 
-    // Calculate retry rate
-    const uniqueSessions = new Set(responses.map(r => r.session_id)).size;
-    const retryRate = uniqueSessions > 0 ? (totalAttempts - uniqueSessions) / uniqueSessions : 0;
+      const totalAttempts = challengeResponses.length;
+      const successfulAttempts = challengeResponses.filter(r => r.is_human).length;
+      const averageResponseTime = challengeResponses.reduce((sum, r) => sum + (r.response_time_ms || 0), 0) / totalAttempts;
+      
+      // Calculate device breakdown
+      const deviceBreakdown: Record<string, number> = {};
+      challengeResponses.forEach(r => {
+        const deviceInfo = parseUserAgent(r.user_agent);
+        const deviceType = deviceInfo.deviceType;
+        deviceBreakdown[deviceType] = (deviceBreakdown[deviceType] || 0) + 1;
+      });
 
-    // Calculate average bot detection confidence
-    // In production, this would come from bot_detection_metrics table
-    const botDetectionConfidence = 0.89; // Placeholder value
+      // Calculate time of day breakdown
+      const timeOfDayBreakdown: Record<string, number> = {};
+      challengeResponses.forEach(r => {
+        const hour = new Date(r.created_at).getHours();
+        const timeSlot = getTimeSlot(hour);
+        timeOfDayBreakdown[timeSlot] = (timeOfDayBreakdown[timeSlot] || 0) + 1;
+      });
 
-    return {
-      challengeId,
-      challengeType: responses[0].challenge_type,
-      totalAttempts,
-      successfulAttempts,
-      averageResponseTime: Math.round(averageResponseTime),
-      difficultyRating: metrics.difficultyScore,
-      userSatisfaction: metrics.userFeedback,
-      completionRate: (successfulAttempts / totalAttempts) * 100,
-      retryRate: retryRate * 100,
-      errorRate: ((totalAttempts - successfulAttempts) / totalAttempts) * 100,
-      deviceBreakdown,
-      timeOfDayBreakdown,
-      botDetectionConfidence
-    };
+      const metrics = calculateChallengeMetrics(challengeResponses);
+
+      // Calculate retry rate
+      const uniqueSessions = new Set(challengeResponses.map(r => r.session_id)).size;
+      const retryRate = uniqueSessions > 0 ? (totalAttempts - uniqueSessions) / uniqueSessions : 0;
+
+      // Calculate average bot detection confidence
+      // In production, this would come from bot_detection_metrics table
+      const botDetectionConfidence = 0.89; // Placeholder value
+
+      analyticsResults.push({
+        challengeId,
+        challengeType: challengeResponses[0].challenge_type || 'Unknown',
+        totalAttempts,
+        successfulAttempts,
+        averageResponseTime: Math.round(averageResponseTime),
+        difficultyRating: metrics.difficultyScore,
+        userSatisfaction: metrics.userFeedback,
+        completionRate: totalAttempts > 0 ? (successfulAttempts / totalAttempts) * 100 : 0,
+        retryRate: retryRate * 100,
+        errorRate: totalAttempts > 0 ? ((totalAttempts - successfulAttempts) / totalAttempts) * 100 : 0,
+        deviceBreakdown,
+        timeOfDayBreakdown,
+        botDetectionConfidence
+      });
+    }
+
+    return analyticsResults;
 
   } catch (error) {
     console.error('Error getting challenge analytics:', error);
-    return null;
+    // Return empty analytics for all requested challenge IDs instead of null
+    return (challengeIds || []).map(challengeId => ({
+      challengeId,
+      challengeType: 'Unknown',
+      totalAttempts: 0,
+      successfulAttempts: 0,
+      averageResponseTime: 0,
+      difficultyRating: 0,
+      userSatisfaction: 0,
+      completionRate: 0,
+      retryRate: 0,
+      errorRate: 0,
+      deviceBreakdown: {},
+      timeOfDayBreakdown: {},
+      botDetectionConfidence: 0
+    }));
   }
 };
 
