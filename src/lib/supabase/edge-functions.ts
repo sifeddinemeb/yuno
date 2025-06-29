@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase } from '../supabase';
 
 /**
  * Calls a Supabase Edge Function with proper error handling
