@@ -4,6 +4,7 @@
  */
 
 import { supabase } from './supabase';
+import { getApiKey } from './supabase/edge-functions';
 
 export interface ContentGenerationRequest {
   challengeType: string;
@@ -55,15 +56,13 @@ class GeminiContentGenerator {
       
       if (!this.apiKey) {
         try {
-          const { data, error } = await supabase.functions.invoke('get-env-var', {
-            body: { key: 'GEMINI_API_KEY' }
-          });
+          const apiKey = await getApiKey('GEMINI_API_KEY');
           
-          if (data?.value) {
-            this.apiKey = data.value;
+          if (apiKey) {
+            this.apiKey = apiKey;
             this.mockData = false;
-          } else if (error) {
-            console.warn(`Failed to fetch API key: ${error.message}`);
+          } else {
+            console.warn('Failed to fetch API key, will use mock data');
             this.mockData = true;
           }
         } catch (backendError) {
