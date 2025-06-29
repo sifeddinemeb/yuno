@@ -22,11 +22,13 @@ import Card from '../../components/ui/Card/Card';
 import PublicNavbar from '../../components/layout/PublicNavbar/PublicNavbar';
 import YunoWidget from '../../components/widget/YunoWidget/YunoWidget';
 import BackgroundBlobs from '../../components/layout/BackgroundBlobs/BackgroundBlobs';
+import TavusVideoAgent from '../../components/video/TavusVideoAgent/TavusVideoAgent';
 
 const Demo = () => {
   const [completedChallenges, setCompletedChallenges] = useState(0);
   const [activeChallenge, setActiveChallenge] = useState<string | null>(null);
   const [isVerified, setIsVerified] = useState(false);
+  const [videoAgentCompleted, setVideoAgentCompleted] = useState(false);
 
   const handleVerified = (sessionId: string) => {
     setIsVerified(true);
@@ -46,6 +48,11 @@ const Demo = () => {
   const tryChallenge = (challengeId: string) => {
     setActiveChallenge(challengeId);
     setIsVerified(false);
+  };
+
+  const handleConversationEnd = (success: boolean) => {
+    setVideoAgentCompleted(true);
+    console.log('Video agent conversation ended with success:', success);
   };
 
   const challenges = [
@@ -242,36 +249,49 @@ const Demo = () => {
       <PublicNavbar />
       <BackgroundBlobs />
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-32 pb-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* Hero Section with Tavus Video Agent */}
+      <section className="relative overflow-hidden pt-32 pb-20 px-4">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              A Gallery of
-              <br />
-              <span className="bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
-                Human Intelligence
-              </span>
-            </h1>
-            
-            <p className="text-lg md:text-xl text-muted max-w-2xl mx-auto mb-8">
-              Explore challenges designed to be fun for you, insightful for AI, and impossible for bots. Each 
-              interaction is a vote for a smarter, safer, and more interesting digital world.
-            </p>
-
-            <div className="flex justify-center mb-12">
-              <Link to="#live-demo">
-                <Button size="lg" className="px-8 flex items-center">
-                  <Play className="w-4 h-4 mr-2" />
-                  Try a Live Functional Demo
-                </Button>
-              </Link>
+            <div className="text-center mb-8">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                A Gallery of
+                <br />
+                <span className="bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+                  Human Intelligence
+                </span>
+              </h1>
+              
+              <p className="text-lg md:text-xl text-muted max-w-3xl mx-auto mb-8">
+                Meet our AI guide and explore challenges designed to be fun for you, 
+                insightful for AI, and impossible for bots.
+              </p>
             </div>
-            <p className="text-sm text-muted">Experience RealCaptcha in action with real challenges</p>
+            
+            <TavusVideoAgent 
+              agentName="Yuno"
+              onConversationEnd={handleConversationEnd}
+            />
+            
+            {videoAgentCompleted && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-8 text-center"
+              >
+                <p className="text-muted mb-4">Ready to explore more human verification challenges?</p>
+                <Link to="#live-demo">
+                  <Button size="lg" className="px-8 flex items-center">
+                    <Play className="w-4 h-4 mr-2" />
+                    Try Interactive Challenges
+                  </Button>
+                </Link>
+              </motion.div>
+            )}
           </motion.div>
         </div>
       </section>
